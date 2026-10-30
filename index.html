@@ -102,7 +102,7 @@ aside{background:var(--p)}.tabs{margin:10px;padding:4px;background:var(--h);bord
 <section id="login" hidden class="view"><div class="hero"><div class="bp"></div><div class="hb"><svg class="mark"><use href="#mc"/></svg><span class="wm">Mini<b>CAD</b></span></div>
 <div><h1>Sketch it.<br>Gear it.<br><em>Build it together.</em></h1><p>A 3D designer in your browser, with gears, motors and live collaboration.</p>
 <ul class="feat"><li><svg class="i"><use href="#i-cube"/></svg><div><b>Real 3D modelling</b><span>Shapes, gears, booleans and STL export</span></div></li><li><svg class="i"><use href="#i-uadd"/></svg><div><b>Invite friends</b><span>Co-owners, builders, reviewers or viewers</span></div></li><li><svg class="i"><use href="#i-plus"/></svg><div><b>One click to start</b><span>Create a project and land straight in the designer</span></div></li></ul></div><div></div></div>
-<div class="lf"><div class="box"><svg class="mark"><use href="#mc"/></svg><h2>Welcome</h2><div class="mut">Pick a username to enter MiniCAD.</div><input id="un" maxlength="20" placeholder="Username" autocomplete="username"><div class="err" id="lerr"></div><button class="pri" id="lgo">Continue</button><p class="mut" style="font-size:12px;margin:14px 0 0">No password. Stored on this device only.</p></div></div></section>
+<div class="lf"><div class="box"><svg class="mark"><use href="#mc"/></svg><h2>Welcome</h2><div class="mut">Pick a display name. Your unique link is created for you.</div><input id="un" maxlength="20" placeholder="Display name" autocomplete="username"><div class="err" id="lerr"></div><button class="pri" id="lgo">Continue</button><p class="mut" style="font-size:12px;margin:14px 0 0">No password. Stored on this device only.</p></div></div></section>
 <div id="app" hidden class="view">
 <header><div class="brand"><svg class="mark"><use href="#mc"/></svg><span class="wm">Mini<b>CAD</b></span></div>
 <button class="pri cta" id="newp"><svg class="i"><use href="#i-plus"/></svg>Create project</button>
@@ -117,13 +117,32 @@ const DESIGN='https://arulv123.github.io/Mini-Cad/'; // the live designer; opene
 const $=i=>document.getElementById(i),veil=$('veil');
 const rj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},wj=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const rid=()=>Math.random().toString(36).slice(2,10),fmt=t=>new Date(t).toLocaleString([], {dateStyle:'medium',timeStyle:'short'});
+const rid=()=>{try{const a=new Uint8Array(6);crypto.getRandomValues(a);return [...a].map(x=>(x%36).toString(36)).join('')}catch(e){return Math.random().toString(36).slice(2,8)}},dn=h=>String(h||'').split('~')[0],fmt=t=>new Date(t).toLocaleString([], {dateStyle:'medium',timeStyle:'short'});
 const ROLES=['Co-owner','Builder','Reviewer','Viewer'];
 let me=rj('mc_me',null),tab='fr',chatWith=null;
+try{const q0=new URLSearchParams(location.search);if(q0.get('add')||q0.get('join'))sessionStorage.setItem('mc_pend',location.search)}catch(e){}
 const bc=window.BroadcastChannel?new BroadcastChannel('minicad'):null;
 const ping=()=>{bc&&bc.postMessage(1)};
 const go=u=>{veil.style.transition='none';veil.classList.add('on');location.assign(u)};
 const show=()=>{veil.style.transition='';veil.classList.remove('on');veil.style.opacity=''};
+
+/* unique links: your personal link, project links, and opening them */
+const toast=t=>{let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';e.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--t);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:1000;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:opacity .25s;pointer-events:none';document.body.appendChild(e)}e.textContent=t;e.style.opacity=1;clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity=0,2400)};
+const copy=async t=>{try{await navigator.clipboard.writeText(t)}catch(e){const i=document.createElement('textarea');i.value=t;document.body.appendChild(i);i.select();try{document.execCommand('copy')}catch(x){}i.remove()}toast('Link copied')};
+const base=()=>location.origin+location.pathname;
+const myLink=()=>base()+'?add='+encodeURIComponent(me.name);
+const projLink=p=>base()+'?join='+encodeURIComponent(p.id)+'&o='+encodeURIComponent(p.owner)+'&n='+encodeURIComponent(p.name);
+function linkIn(){const s=sessionStorage.getItem('mc_pend');if(!s||!me)return;sessionStorage.removeItem('mc_pend');try{history.replaceState(null,'',location.pathname)}catch(e){}
+const q=new URLSearchParams(s),a=q.get('add'),j=q.get('join');
+if(a){if(!/^[\w.~-]{2,40}$/.test(a))return toast('That link is not valid');
+if(a===me.name)return toast('That is your own link');
+if(!friends(me.name).includes(a)){setFr(me.name,[...friends(me.name),a]);setFr(a,[...friends(a),me.name]);ping()}
+tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));render();return toast('Connected with '+dn(a))}
+if(j){if(!/^[\w-]{3,40}$/.test(j))return toast('That link is not valid');
+const o=/^[\w.~-]{2,40}$/.test(q.get('o')||'')?q.get('o'):'',n=(q.get('n')||'Shared project').slice(0,40),ps=rj('mc_projects',[]);let pr=ps.find(x=>x.id===j);
+if(!pr){pr={id:j,name:n,owner:o,members:[],allowHostLeave:true,created:Date.now()};ps.push(pr)}
+if(pr.owner!==me.name&&!pr.members.some(m=>m.user===me.name))pr.members.push({user:me.name,role:'Builder',status:'accepted'});
+wj('mc_projects',ps);go(DESIGN+'?p='+encodeURIComponent(j))}}
 
 /* data helpers (all in localStorage; keyed by username so a backend/WebRTC layer can replace them later) */
 const friends=u=>rj('mc_friends',{})[u]||[];
@@ -136,7 +155,7 @@ const pkey=(a,b)=>[a,b].sort().join('|');
 /* login */
 function login(name){name=name.trim();if(!/^[\w.-]{2,20}$/.test(name)){$('lerr').textContent='Use 2–20 letters, numbers, _ . -';return}
 const us=rj('mc_users',{}),old=us[name],now=Date.now();
-const u=Object.assign({name,id:'u_'+rid(),peer:'peer-'+rid()+rid(),created:now,logins:0},old||{});
+const u=Object.assign({name:name+'~'+rid(),id:'u_'+rid(),peer:'peer-'+rid()+rid(),created:now,logins:0},old||{});
 u.prevLogin=u.last||null;u.last=now;u.logins++;us[name]=u;wj('mc_users',us);
 me=Object.assign({},u,{session:rid(),ua:navigator.userAgent,lang:navigator.language,tz:Intl.DateTimeFormat().resolvedOptions().timeZone,screen:screen.width+'×'+screen.height});
 wj('mc_me',me);boot()}
@@ -145,19 +164,20 @@ $('out').onclick=()=>{localStorage.removeItem('mc_me');me=null;boot()};
 
 function boot(){document.body.classList.toggle('out',!me);$('login').hidden=!!me;$('app').hidden=!me;
 if(!me){setTimeout(()=>$('un').focus(),50);show();return}
-$('hname').textContent=me.name;$('gr').innerHTML='Hi, '+esc(me.name)+'<small>Pick up where you left off or start something new.</small>';$('hav').textContent=me.name[0];render();show()}
+$('hname').textContent=dn(me.name);$('gr').innerHTML='Hi, '+esc(dn(me.name))+'<small>Pick up where you left off or start something new.</small>';$('hav').textContent=dn(me.name)[0];render();show();linkIn()}
 
 /* render */
 function render(){if(!me)return;renderProjects();renderNotes();renderPane()}
 function card(p,mine){const r=mine?'Owner':(p.members.find(m=>m.user===me.name)||{}).role,acc=p.members.filter(m=>m.status==='accepted'),ppl=[p.owner,...acc.map(m=>m.user)],pend=p.members.filter(m=>m.status==='pending').length;
 return `<article class="proj"><div class="th" data-open="${p.id}" style="${p.thumb?`background-image:url(${p.thumb})`:''}">${p.thumb?'':'<svg class="ph"><use href="#mc"/></svg>'}<span class="go">Open designer →</span></div>
-<div class="pi"><div class="pt"><b>${esc(p.name)}</b>${mine?`<span class="ib"><button data-ren="${p.id}" title="Rename"><svg class="i"><use href="#i-edit"/></svg></button><button class="bad" data-del="${p.id}" title="Delete"><svg class="i"><use href="#i-trash"/></svg></button></span>`:''}</div><small>${mine?'':'by '+esc(p.owner)+' · '}${p.updated?'Saved '+fmt(p.updated):'Created '+fmt(p.created)}</small>
-<div class="pa"><span class="stack">${ppl.slice(0,4).map(n=>`<span class="av s" title="${esc(n)}">${esc(n[0])}</span>`).join('')}</span><span class="tag">${esc(r)}</span><span class="sp"></span>${mine?`<button class="inv" data-inv="${p.id}" title="Add friends to this project"><svg class="i"><use href="#i-uadd"/></svg>Invite${pend?` <em>${pend}</em>`:''}</button>`:`<button class="sm" data-open="${p.id}">Open</button>`}</div></div></article>`}
+<div class="pi"><div class="pt"><b>${esc(p.name)}</b>${mine?`<span class="ib"><button data-ren="${p.id}" title="Rename"><svg class="i"><use href="#i-edit"/></svg></button><button class="bad" data-del="${p.id}" title="Delete"><svg class="i"><use href="#i-trash"/></svg></button></span>`:''}</div><small>${mine?'':'by '+esc(dn(p.owner)||'a friend')+' · '}${p.updated?'Saved '+fmt(p.updated):'Created '+fmt(p.created)}</small>
+<div class="pa"><span class="stack">${ppl.slice(0,4).map(n=>`<span class="av s" title="${esc(dn(n))}">${esc(dn(n)[0]||'?')}</span>`).join('')}</span><span class="tag">${esc(r)}</span><span class="sp"></span><button class="inv" data-cp="${p.id}" title="Copy a link to this project">🔗 Copy link</button>${mine?`<button class="inv" data-inv="${p.id}" title="Add friends to this project"><svg class="i"><use href="#i-uadd"/></svg>Invite${pend?` <em>${pend}</em>`:''}</button>`:`<button class="sm" data-open="${p.id}">Open</button>`}</div></div></article>`}
 function renderProjects(){const ps=rj('mc_projects',[]),mine=ps.filter(p=>p.owner===me.name),sh=ps.filter(p=>p.owner!==me.name&&p.members.some(m=>m.user===me.name&&m.status==='accepted'));
 $('mine').innerHTML='<div class="newt" data-new="1"><i><svg class="i"><use href="#i-plus"/></svg></i>Create project<small>Opens the designer instantly</small></div>'+mine.map(p=>card(p,1)).join('');
 $('shared').innerHTML=sh.map(p=>card(p,0)).join('')||'<div class="empty">Projects friends add you to will show here.</div>'}
-document.addEventListener('click',e=>{const t=e.target,d=t.closest('[data-del]'),i=t.closest('[data-inv]'),rn=t.closest('[data-ren]'),o=t.closest('[data-open]');
-if(d){if(!confirm('Delete this project and its saved design?'))return;const id=d.dataset.del;wj('mc_projects',rj('mc_projects',[]).filter(p=>p.id!==id));
+document.addEventListener('click',e=>{const t=e.target,d=t.closest('[data-del]'),i=t.closest('[data-inv]'),rn=t.closest('[data-ren]'),o=t.closest('[data-open]'),cp=t.closest('[data-cp]');
+if(cp){const q=rj('mc_projects',[]).find(x=>x.id===cp.dataset.cp);if(q)copy(projLink(q))}
+else if(d){if(!confirm('Delete this project and its saved design?'))return;const id=d.dataset.del;wj('mc_projects',rj('mc_projects',[]).filter(p=>p.id!==id));
 try{const r=indexedDB.open('minicad',1);r.onupgradeneeded=()=>r.result.createObjectStore('scenes');r.onsuccess=()=>{const x=r.result.transaction('scenes','readwrite');x.objectStore('scenes').delete(id)}}catch(x){}render()}
 else if(i)picker(i.dataset.inv);
 else if(rn){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===rn.dataset.ren),n=prompt('Rename project:',p.name);if(n&&n.trim()){p.name=n.trim().slice(0,40);wj('mc_projects',ps);render()}}
@@ -168,8 +188,8 @@ else if(o)go(DESIGN+'?p='+o.dataset.open)});
 const ago=t=>{const x=(Date.now()-t)/1e3;return x<60?'just now':x<3600?Math.floor(x/60)+'m ago':x<86400?Math.floor(x/3600)+'h ago':fmt(t)};
 function renderNotes(){const l=notes(me.name),n=l.filter(x=>!x.read).length;$('dot').hidden=!n;$('dot').textContent=n>9?'9+':n;$('bell').classList.toggle('ring',!!n);
 $('notes').innerHTML=`<div class="nh"><b>Notifications</b>${n?`<span class="tag ok">${n} new</span>`:''}<span class="sp"></span>${l.length?'<button class="sm" id="nclr">Clear all</button>':''}</div><div class="nl">`+(l.map(x=>{let ic='info',txt,act='';
-if(x.type==='friend_request'){ic='uadd';txt=`<b>${esc(x.from)}</b> sent you a friend request`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Accept</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
-else if(x.type==='project_invite'){ic='cube';txt=`<b>${esc(x.from)}</b> invited you to <b>${esc(x.name)}</b> as ${esc(x.role)}`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Join</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
+if(x.type==='friend_request'){ic='uadd';txt=`<b>${esc(dn(x.from))}</b> sent you a friend request`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Accept</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
+else if(x.type==='project_invite'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> invited you to <b>${esc(x.name)}</b> as ${esc(x.role)}`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Join</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
 else txt=esc(x.text);
 return `<div class="ni${x.read?'':' un'}"><span class="nic ${ic}"><svg class="i"><use href="#i-${ic==='uadd'?'uadd':ic}"/></svg></span><div class="sp">${txt}<small class="mut">${ago(x.t)}${x.done?' · '+(x.done==='y'?'accepted':'declined'):''}</small>${act?`<div class="na">${act}</div>`:''}</div></div>`}).join('')||'<div class="nz"><svg class="i"><use href="#i-bell"/></svg><b>You’re all caught up</b><span class="mut">Friend requests and project invites show up here.</span></div>')+'</div>'}
 const closeN=()=>{if($('notes').hidden)return;$('notes').hidden=true;setNotes(me.name,notes(me.name).map(x=>(x.read=1,x)));renderNotes()};
@@ -178,29 +198,29 @@ document.addEventListener('click',e=>{if(me&&!$('notes').hidden&&!e.target.close
 addEventListener('keydown',e=>{if(e.key==='Escape'&&me)closeN()});
 $('notes').onclick=e=>{const b=e.target;if(b.id==='nclr'){setNotes(me.name,[]);return render()}
 const id=b.dataset.na;if(!id)return;const l=notes(me.name),n=l.find(x=>x.id===id),yes=b.dataset.v==='y';n.done=b.dataset.v;n.read=1;setNotes(me.name,l);
-if(n.type==='friend_request'&&yes){setFr(me.name,[...friends(me.name),n.from]);setFr(n.from,[...friends(n.from),me.name]);pushNote(n.from,{type:'info',text:me.name+' accepted your friend request'})}
-if(n.type==='project_invite'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===n.pid),m=p&&p.members.find(q=>q.user===me.name);if(m){m.status=yes?'accepted':'declined';wj('mc_projects',ps);pushNote(p.owner,{type:'info',text:`${me.name} ${yes?'joined':'declined'} "${p.name}"`})}}
+if(n.type==='friend_request'&&yes){setFr(me.name,[...friends(me.name),n.from]);setFr(n.from,[...friends(n.from),me.name]);pushNote(n.from,{type:'info',text:dn(me.name)+' accepted your friend request'})}
+if(n.type==='project_invite'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===n.pid),m=p&&p.members.find(q=>q.user===me.name);if(m){m.status=yes?'accepted':'declined';wj('mc_projects',ps);pushNote(p.owner,{type:'info',text:`${dn(me.name)} ${yes?'joined':'declined'} "${p.name}"`})}}
 ping();render()};
 
 /* side pane */
 document.querySelector('.tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;tab=t;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));renderPane()};
 function renderPane(){const p=$('pane'),f=friends(me.name);
-if(tab==='fr'){p.innerHTML=`<div class="add"><input id="fa" placeholder="Add friend by username" maxlength="20"><button class="pri" id="fb">Add</button></div><div class="err" id="ferr"></div>`+
-(f.map(n=>`<div class="row"><span class="av s">${esc(n[0])}</span><span class="sp">${esc(n)}</span><button class="sm" data-chat="${esc(n)}">Message</button><button class="sm bad" data-rm="${esc(n)}">✕</button></div>`).join('')||'<div class="empty">No friends yet. Add someone by username; they get a request when they log in.</div>');
+if(tab==='fr'){p.innerHTML=`<label class="l">Your unique link</label><div class="add"><input id="ml" readonly value="${esc(myLink())}" onfocus="this.select()"><button class="pri" id="cpl">Copy</button></div><label class="l">Connect with a friend</label><div class="add"><input id="fa" placeholder="Paste a friend's link"><button class="pri" id="fb">Add</button></div><div class="err" id="ferr"></div>`+
+(f.map(n=>`<div class="row"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}</span><button class="sm" data-chat="${esc(n)}">Message</button><button class="sm bad" data-rm="${esc(n)}">✕</button></div>`).join('')||'<div class="empty">No friends yet. Copy your link and send it, or paste a link from a friend above.</div>');
 }
-else if(tab==='ms'){const top=f.length?`<select id="cw" style="margin-bottom:8px;width:100%">${f.map(n=>`<option ${n===chatWith?'selected':''}>${esc(n)}</option>`).join('')}</select>`:'';
+else if(tab==='ms'){const top=f.length?`<select id="cw" style="margin-bottom:8px;width:100%">${f.map(n=>`<option value="${esc(n)}" ${n===chatWith?'selected':''}>${esc(dn(n))}</option>`).join('')}</select>`:'';
 if(!chatWith||!f.includes(chatWith))chatWith=f[0]||null;
 if(!chatWith){p.innerHTML='<div class="empty">Add a friend first to start chatting.</div>';return}
 const ms=rj('mc_msgs',{})[pkey(me.name,chatWith)]||[];
-p.innerHTML=`<div class="chat">${top}<div class="msgs" id="msgs">${ms.map(m=>`<div class="msg ${m.from===me.name?'me':''}">${esc(m.text)}</div>`).join('')||'<div class="empty">Say hi 👋</div>'}</div><div class="add" style="margin:8px 0 0"><input id="mt" placeholder="Message ${esc(chatWith)}"><button class="pri" id="mb">Send</button></div></div>`;
+p.innerHTML=`<div class="chat">${top}<div class="msgs" id="msgs">${ms.map(m=>`<div class="msg ${m.from===me.name?'me':''}">${esc(m.text)}</div>`).join('')||'<div class="empty">Say hi 👋</div>'}</div><div class="add" style="margin:8px 0 0"><input id="mt" placeholder="Message ${esc(dn(chatWith))}"><button class="pri" id="mb">Send</button></div></div>`;
 const m=$('msgs');m.scrollTop=m.scrollHeight}
-else{const rows=[['Username',me.name],['User ID',me.id],['WebRTC peer ID',me.peer],['Session ID',me.session],['Account created',fmt(me.created)],['This login',fmt(me.last)],['Previous login',me.prevLogin?fmt(me.prevLogin):'First time'],['Total logins',me.logins],['Time zone',me.tz],['Language',me.lang],['Screen',me.screen],['Device',me.ua]];
+else{const rows=[['Display name',dn(me.name)],['Your link',myLink()],['User ID',me.id],['WebRTC peer ID',me.peer],['Session ID',me.session],['Account created',fmt(me.created)],['This login',fmt(me.last)],['Previous login',me.prevLogin?fmt(me.prevLogin):'First time'],['Total logins',me.logins],['Time zone',me.tz],['Language',me.lang],['Screen',me.screen],['Device',me.ua]];
 p.innerHTML=`<dl>${rows.map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('')}</dl><p class="mut" style="font-size:12px">Saved on this device. The design page reads this same session (<code>window.MC</code>) so it can use the peer ID and project room for WebRTC.</p>`}}
 $('pane').onclick=e=>{const b=e.target;
-if(b.id==='fb'){const n=$('fa').value.trim();if(!/^[\w.-]{2,20}$/.test(n))return $('ferr').textContent='Enter a valid username';
-if(n===me.name)return $('ferr').textContent="That's you";if(friends(me.name).includes(n))return $('ferr').textContent='Already friends';
-const dup=notes(n).some(x=>x.type==='friend_request'&&x.from===me.name&&!x.done);if(dup)return $('ferr').textContent='Request already sent';
-pushNote(n,{type:'friend_request',from:me.name});$('fa').value='';$('ferr').textContent='Request sent to '+n;$('ferr').style.color='var(--ok)'}
+if(b.id==='fb'){const v=$('fa').value.trim();if(!v)return $('ferr').textContent='Paste a link first';$('ferr').textContent='';
+let qs;try{qs=v.includes('?')?v.slice(v.indexOf('?')):'?add='+encodeURIComponent(v)}catch(x){qs=''}
+sessionStorage.setItem('mc_pend',qs);$('fa').value='';linkIn()}
+if(b.id==='cpl')copy($('ml').value);
 if(b.dataset.chat){chatWith=b.dataset.chat;tab='ms';document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='ms'));renderPane()}
 if(b.dataset.rm&&confirm('Remove '+b.dataset.rm+'?')){const n=b.dataset.rm;setFr(me.name,friends(me.name).filter(x=>x!==n));setFr(n,friends(n).filter(x=>x!==me.name));ping();renderPane()}
 if(b.id==='mb')send()};
@@ -215,8 +235,8 @@ $('newf').onclick=()=>picker(null);
 function picker(pid){const ps=rj('mc_projects',[]),pr=pid&&ps.find(p=>p.id===pid),taken=pr?pr.members.map(m=>m.user):[],f=friends(me.name).filter(n=>!taken.includes(n)),m=document.createElement('div');m.className='modal';
 m.innerHTML=`<div class="card"><h3>${pr?'Add friends to “'+esc(pr.name)+'”':'New project with friends'}</h3><div class="mut">Choose who joins and what they can do.</div>
 ${pr?'':'<label class="l">Project name</label><input id="pn" maxlength="40" placeholder="e.g. Gear bearing">'}
-${pr&&pr.members.length?`<label class="l">Already invited</label>${pr.members.map(x=>`<div class="row"><span class="av s">${esc(x.user[0])}</span><span class="sp">${esc(x.user)}</span><span class="tag">${esc(x.role)}</span><span class="tag ${x.status==='accepted'?'ok':''}">${esc(x.status)}</span></div>`).join('')}`:''}
-<label class="l">Friends</label><div>${f.map(n=>`<div class="row"><input type="checkbox" data-u="${esc(n)}"><span class="av s">${esc(n[0])}</span><span class="sp">${esc(n)}</span><select data-r="${esc(n)}" style="height:30px">${ROLES.map(r=>`<option${r==='Builder'?' selected':''}>${r}</option>`).join('')}</select></div>`).join('')||'<div class="empty">No friends to add. Add friends from the Friends tab first.</div>'}</div>
+${pr&&pr.members.length?`<label class="l">Already invited</label>${pr.members.map(x=>`<div class="row"><span class="av s">${esc(dn(x.user)[0]||'?')}</span><span class="sp">${esc(dn(x.user))}</span><span class="tag">${esc(x.role)}</span><span class="tag ${x.status==='accepted'?'ok':''}">${esc(x.status)}</span></div>`).join('')}`:''}
+<label class="l">Friends</label><div>${f.map(n=>`<div class="row"><input type="checkbox" data-u="${esc(n)}"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}</span><select data-r="${esc(n)}" style="height:30px">${ROLES.map(r=>`<option${r==='Builder'?' selected':''}>${r}</option>`).join('')}</select></div>`).join('')||'<div class="empty">No friends to add. Add friends from the Friends tab first.</div>'}</div>
 <label class="sw"><input type="checkbox" id="ah" ${pr&&pr.allowHostLeave?'checked':''}><span><b>Keep project open when I leave</b><br><small class="mut">Members can enter and keep working even if the host is offline.</small></span></label>
 <div class="err" id="perr"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="pc">Cancel</button><button class="pri" id="pk">${pr?'Add to project':'Create & open'}</button></div></div>`;
 document.body.appendChild(m);if($('pn'))$('pn').focus();$('pc').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};

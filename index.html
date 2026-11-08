@@ -167,10 +167,12 @@ const rid=()=>{try{const a=new Uint8Array(6);crypto.getRandomValues(a);return [.
 const ROLES=['Co-owner','Builder','Reviewer','Viewer'];
 const getMe=()=>{try{const s=JSON.parse(sessionStorage.getItem('mc_tab'));if(s&&s.name)return s}catch(e){}return rj('mc_me',null)};
 let me=getMe(),tab='fr',chatWith=null;
+/* remember the account: unless you pressed Log out, reopen straight into the last used account */
+if(!me&&!localStorage.getItem('mc_out')){try{const us=Object.values(rj('mc_users',{})).filter(u=>u&&u.name).sort((a,b)=>(b.last||0)-(a.last||0));if(us[0]){me=Object.assign({},us[0],{session:rid(),ua:navigator.userAgent,lang:navigator.language,tz:Intl.DateTimeFormat().resolvedOptions().timeZone,screen:screen.width+'×'+screen.height});localStorage.setItem('mc_me',JSON.stringify(me));try{sessionStorage.setItem('mc_tab',JSON.stringify(me))}catch(e){}}}catch(e){}}
 const capLink=()=>{try{const h=location.hash.replace(/^#/,''),s=location.search.replace(/^\?/,''),raw=[h,s].find(x=>/(^|&)(add|join|inv)=/.test(x));if(raw)sessionStorage.setItem('mc_pend','?'+raw)}catch(e){}};capLink();
 const bc=window.BroadcastChannel?new BroadcastChannel('minicad'):null;
 const ping=()=>{bc&&bc.postMessage(1)};
-const go=u=>{veil.style.transition='none';veil.classList.add('on');location.assign(u)};
+const go=u=>{window.__nav=1;veil.style.transition='none';veil.classList.add('on');location.assign(u)};
 const show=()=>{veil.style.transition='';veil.classList.remove('on');veil.style.opacity=''};
 
 /* unique links: your personal link, project links, and opening them */
@@ -241,7 +243,7 @@ function netUI(){const e=document.getElementById('nst');if(!e)return;const s=NET
  e.textContent=s==='on'?'\u25CF You are online \u2013 friends can reach you live':s==='nolib'?'\u25CB Could not load the connection library \u2013 check your internet':s==='err'?'\u25CB Connection problem \u2013 retrying':'\u25CB Connecting\u2026';
  e.style.color=s==='on'?'#1fa971':''}
 const isOn=n=>{const p=PRES[n];return !!p&&(!!p.on||Date.now()-(p.inAt||0)<(document.hidden?9e4:25e3))};
-function presLabel(n){if(isOn(n))return '<b style="color:#1fa971">\u25CF</b> Online';const p=PRES[n]||{},t=Math.max(p.seenAt||0,p.inAt||0,(rj('mc_ls',{})[me.name+'|'+n])||0);
+function presLabel(n){if(isOn(n)){const w=(PRES[n]||{}).w;return w==='b'?'<b style="color:#f5a623">\u25CF</b> In the builder':'<b style="color:#1fa971">\u25CF</b> Online'}const p=PRES[n]||{},t=Math.max(p.seenAt||0,p.inAt||0,(rj('mc_ls',{})[me.name+'|'+n])||0);
  return '<b style="color:#98a2b3">\u25CF</b> Offline'+(t?' \u00B7 last seen '+ago(t):'')}
 function presUI(){if(!me)return;document.querySelectorAll('[data-pst]').forEach(e=>{e.innerHTML=presLabel(e.dataset.pst)})}
 let rT=0,rDirty=0;
@@ -285,10 +287,10 @@ function setOn(n,on){const p=PRES[n];if(!p)return;if(on)p.seenAt=Date.now();
  if(p.on!==on){p.on=on;presUI()}}
 function dropPres(n){const p=PRES[n];if(p&&p.c){try{p.c.close()}catch(e){}}delete PRES[n]}
 async function connectPres(n,p){p.busy=1;const c=await dial(n);p.busy=0;
- if(!c){p.fail=(p.fail||0)+1;p.next=Date.now()+Math.min(6000*p.fail,30000);setOn(n,false);return}
+ if(!c){p.fail=(p.fail||0)+1;p.next=Date.now()+Math.min(2500*p.fail,15000);if(Date.now()-(p.seenAt||0)>20000)setOn(n,false);return}
  p.fail=0;p.c=c;p.at=Date.now();
- c.on('data',m=>{if(m&&m.t==='pong'){p.at=Date.now();setOn(n,true)}else if(m&&m.t==='bye')gone(n)});
- c.on('close',()=>{if(p.c===c){p.c=null;setOn(n,false);p.next=Date.now()+2000;presUI()}});
+ c.on('data',m=>{if(m&&m.t==='pong'){p.at=Date.now();p.w=m.w==='b'?'b':'l';setOn(n,true);presUI()}else if(m&&m.t==='bye')gone(n)});
+ c.on('close',()=>{if(p.c===c){p.c=null;if(Date.now()-(p.seenAt||0)>20000)setOn(n,false);p.next=Date.now()+1500;presUI()}});
  c.on('error',()=>{});
  try{c.send({t:'ping'})}catch(e){}}
 function presTick(){
@@ -305,7 +307,8 @@ function presTick(){
 function onConn(c){c.on('close',()=>{const p=c._pn&&PRES[c._pn];if(p&&p.inC===c){p.inC=null;p.inAt=0;presUI()}});
  c.on('data',m=>{if(!me||!m)return;
  if(m.t==='bye'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n)gone(n);return}
- if(m.t==='ping'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n){const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};c._pn=n;p.inC=c;p.inAt=Date.now();p.seenAt=Date.now();try{c.send({t:'pong'})}catch(e){}presUI()}return}
+ if(m.t==='ping'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n){const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};c._pn=n;p.inC=c;p.inAt=Date.now();p.seenAt=Date.now();try{c.send({t:'pong',w:'l'})}catch(e){}presUI()}return}
+ if(m.t==='binv')return gotBinv(c,m);
  if(m.t==='scq')return serveScene(c,m);if(m.t==='knock')return onKnock(c,m);if(m.t!=='env')return;let ok=false;try{ok=handle(m.e,c.peer)}catch(x){console.error(x)}
  if(ok){try{c.send({t:'ack',id:m.e.id})}catch(x){}softRender();ping()}})}
 /* ---- store-and-forward of project changes (kept in the outbox like messages until the member is online) ---- */
@@ -332,6 +335,26 @@ async function scnRecv(f,d){const p=rj('mc_projects',[]).find(x=>x.id===d.pid);i
  const ps=rj('mc_projects',[]),q=ps.find(x=>x.id===p.id);if(q){q.updated=ts;wj('mc_projects',ps)}
  const sent=rj('mc_scn_sent',{});sent[p.id+'|'+f]=Math.max(sent[p.id+'|'+f]||0,ts);wj('mc_scn_sent',sent);
  pushNote(me.name,{type:'info',text:dn(f)+' updated \u201c'+p.name+'\u201d \u2014 latest version saved'});softRender()}
+const idbDel=async k=>{try{const db=await idb();await new Promise(res=>{try{const t=db.transaction('scenes','readwrite');t.objectStore('scenes').delete(k);t.oncomplete=()=>{db.close();res()};t.onerror=()=>{db.close();res()}}catch(e){res()}})}catch(e){}};
+function rmWarn(n){const ps=rj('mc_projects',[]),leave=ps.filter(p=>p.owner===n).map(p=>p.name),drop=ps.filter(p=>p.owner===me.name&&(p.members||[]).some(x=>x.user===n)).map(p=>p.name);
+ let t='Remove '+dn(n)+' from your friends?';
+ if(leave.length)t+='\n\n\u2022 You will LEAVE these projects (owned by '+dn(n)+') and their data will be deleted from this device:\n   '+leave.join(', ');
+ if(drop.length)t+='\n\n\u2022 '+dn(n)+' will be REMOVED from your projects and their copy deleted:\n   '+drop.join(', ');
+ return t+'\n\n'+dn(n)+' will be notified. This cannot be undone.'}
+/* a friendship ended: leave the other person's projects (and wipe their data from this device) and drop them from mine */
+function cutProjects(f,byMe,at){at=at||Date.now();const ps=rj('mc_projects',[]),keep=[],sent=rj('mc_scn_sent',{});
+ ps.forEach(p=>{
+  if(p.owner===f&&p.id){idbDel(p.id);Object.keys(sent).forEach(k=>{if(k.startsWith(p.id+'|'))delete sent[k]});
+   pushNote(me.name,{type:'info',text:byMe?'You removed '+dn(f)+' \u2014 you left \u201c'+p.name+'\u201d and its data was deleted from this device ('+fmt(at)+')':dn(f)+' removed you on '+fmt(at)+' \u2014 you were removed from \u201c'+p.name+'\u201d and its data was deleted from this device'});return}
+  if(p.owner===me.name&&(p.members||[]).some(x=>x.user===f)){p.members=p.members.filter(x=>x.user!==f);
+   pushNote(me.name,{type:'info',text:dn(f)+' was removed from \u201c'+p.name+'\u201d ('+fmt(at)+')'})}
+  keep.push(p)});
+ wj('mc_projects',keep);wj('mc_scn_sent',sent);wj('mc_out',outL().filter(e=>e.to!==f));
+ try{softRender()}catch(e){}}
+function gotBinv(c,m){const n=friends(me.name).find(x=>okPeer(c.peer,x));const pid=String(m.pid||'');const p=n&&rj('mc_projects',[]).find(q=>q.id===pid);
+ if(!p||!(p.owner===n||(p.members||[]).some(x=>x.user===n&&x.status==='accepted')))return;
+ const a=notes(me.name);if(a.some(x=>x.type==='build_open'&&x.pid===pid&&x.from===n&&!x.read&&Date.now()-x.t<6e4))return;
+ pushNote(me.name,{type:'build_open',from:n,pid,name:p.name});toast(dn(n)+' is building \u201c'+p.name+'\u201d');try{chime()}catch(e){}try{c.send({t:'bak'})}catch(e){}}
 /* serve the saved scene of a project to its members while this user is on the projects page (designer is closed) */
 const okSc=(peer,n)=>peer===pid(n)||new RegExp('^'+pid(n)+'-\\d{1,2}$').test(String(peer));
 function serveScene(c,m){const PID=String(m.pid||''),reply=(ts,d)=>{try{c.send({t:'scr',pid:PID,ts,d})}catch(e){}};
@@ -355,7 +378,7 @@ function handle(e,peer){
   else if(!notes(me.name).some(x=>x.type==='friend_request'&&x.from===f&&!x.done))pushNote(me.name,{type:'friend_request',from:f})}
  else if(e.k==='fr_acc'){if(asked){setFr(me.name,[...fl,f]);setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:dn(f)+' accepted your friend request'})}}
  else if(e.k==='fr_dec'){if(asked){setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:d.why==='link'?'The invite link from '+dn(f)+' is no longer valid':dn(f)+' declined your friend request'})}}
- else if(e.k==='fr_rm'){if(isF)setFr(me.name,fl.filter(x=>x!==f))}
+ else if(e.k==='fr_rm'){if(isF){setFr(me.name,fl.filter(x=>x!==f));pushNote(me.name,{type:'info',text:dn(f)+' removed you from their friends on '+fmt(+d.at||Date.now())});cutProjects(f,false,+d.at||Date.now());toast(dn(f)+' removed you')}}
  else if(e.k==='chat'){if(isF){addMsg(pkey(me.name,f),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now(),tag:d.tag==='all'?'all':undefined});if(!(tab==='ms'&&chatWith===f&&!document.hidden)){toast('New message from '+dn(f));chime()}}}
  else if(e.k==='pinv'){if(isF&&/^[\w-]{3,40}$/.test(d.pid||''))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer'})}
  else if(e.k==='jadm'){const key=(d.pid||'')+'|'+f;if(jaskL().includes(key)&&/^[\w-]{3,40}$/.test(d.pid||'')){const j=JOIN.cur&&JOIN.cur.pid===d.pid&&JOIN.cur.owner===f?JOIN.cur:null;
@@ -373,9 +396,9 @@ function handle(e,peer){
  return true}
 
 /* own connection: claim slot 1, fall back to the next slot if the server still holds a stale id */
-function gone(n){const p=PRES[n];if(!p)return;p.inAt=0;p.at=0;const c=p.c;p.c=null;try{c&&c.close()}catch(e){}if(p.inC){try{p.inC.close()}catch(e){}p.inC=null}setOn(n,false);p.next=Date.now()+5000;presUI()}
+function gone(n){const p=PRES[n];if(!p)return;p.inAt=0;p.at=0;p.seenAt=0;const c=p.c;p.c=null;try{c&&c.close()}catch(e){}if(p.inC){try{p.inC.close()}catch(e){}p.inC=null}setOn(n,false);p.next=Date.now()+5000;presUI()}
 function sayBye(){try{Object.keys(PRES).forEach(n=>{const p=PRES[n];[p.c,p.inC].forEach(c=>{if(c&&c.open)try{c.send({t:'bye'})}catch(x){}})})}catch(x){}}
-function netStop(){sayBye();clearInterval(NET.timer);NET.timer=0;NET.name=null;NET.open=false;NET.state='off';Object.keys(PRES).forEach(dropPres);if(NET.peer){try{NET.peer.destroy()}catch(e){}NET.peer=null}}
+function netStop(quiet){if(!quiet)sayBye();clearInterval(NET.timer);NET.timer=0;NET.name=null;NET.open=false;NET.state='off';Object.keys(PRES).forEach(dropPres);if(NET.peer){try{NET.peer.destroy()}catch(e){}NET.peer=null}}
 function netStart(){if(!me||NET.name===me.name)return;netStop();NET.name=me.name;
  if(typeof Peer==='undefined'){NET.state='nolib';netUI();return}
  claim(1);NET.timer=setInterval(()=>{if(!me)return;if(NET.open){flush();presTick();window.__scT=(window.__scT||0)+1;if(window.__scT%4===0)scnScan().catch(()=>{})}else if(Date.now()-NET.t>12000)claim(1)},8000)}
@@ -536,9 +559,9 @@ const us=rj('mc_users',{}),key=Object.keys(us).find(k=>k.toLowerCase()===name.to
 const u=Object.assign({name:name+'~'+rid(),id:'u_'+rid(),peer:'peer-'+rid()+rid(),created:now,logins:0},old||{});
 u.prevLogin=u.last||null;u.last=now;u.logins++;us[key]=u;wj('mc_users',us);
 me=Object.assign({},u,{session:rid(),ua:navigator.userAgent,lang:navigator.language,tz:Intl.DateTimeFormat().resolvedOptions().timeZone,screen:screen.width+'×'+screen.height});
-wj('mc_me',me);try{sessionStorage.setItem('mc_tab',JSON.stringify(me))}catch(e){}boot()}
+wj('mc_me',me);localStorage.removeItem('mc_out');try{sessionStorage.setItem('mc_tab',JSON.stringify(me))}catch(e){}boot()}
 $('lgo').onclick=()=>login($('un').value);$('un').onkeydown=e=>{if(e.key==='Enter')login(e.target.value)};
-$('out').onclick=()=>{localStorage.removeItem('mc_me');try{sessionStorage.removeItem('mc_tab')}catch(e){}me=null;boot()};
+$('out').onclick=()=>{localStorage.removeItem('mc_me');localStorage.setItem('mc_out','1');try{sessionStorage.removeItem('mc_tab')}catch(e){}me=null;boot()};
 
 function boot(){document.body.classList.toggle('out',!me);$('login').hidden=!!me;$('app').hidden=!me;
 if(!me){netStop();loginHint();setTimeout(()=>$('un').focus(),50);show();return}
@@ -568,6 +591,7 @@ function renderNotes(){const l=notes(me.name);renderJR(l);const n=l.filter(x=>!x
 $('notes').innerHTML=`<div class="nh"><b>Notifications</b>${n?`<span class="tag ok">${n} new</span>`:''}<span class="sp"></span>${l.length?'<button class="sm" id="nclr">Clear all</button>':''}</div><div class="nl">`+(l.map(x=>{let ic='info',txt,act='';
 if(x.type==='friend_request'){ic='uadd';txt=`<b>${esc(dn(x.from))}</b> sent you a friend request`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Accept</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
 else if(x.type==='project_invite'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> invited you to <b>${esc(x.name)}</b> as ${esc(x.role)}`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Join</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
+else if(x.type==='build_open'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> is working on <b>${esc(x.name)}</b> \u2014 join the build if you like`;act=`<button class="sm pri" data-bo="${esc(x.pid)}">Open builder</button>`}
 else if(x.type==='join_request'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> is asking to join <b>${esc(x.name)}</b>`;if(!x.done)act=roleSel(x.id)+`<button class="sm pri" data-ja="${x.id}" data-v="y">Admit</button><button class="sm" data-ja="${x.id}" data-v="n">Deny</button>`}
 else txt=esc(x.text);
 return `<div class="ni${x.read?'':' un'}"><span class="nic ${ic}"><svg class="i"><use href="#i-${ic==='uadd'?'uadd':ic}"/></svg></span><div class="sp">${txt}<small class="mut">${ago(x.t)}${x.done?' · '+(x.done==='y'?'accepted':'declined'):''}</small>${act?`<div class="na">${act}</div>`:''}</div></div>`}).join('')||'<div class="nz"><svg class="i"><use href="#i-bell"/></svg><b>You’re all caught up</b><span class="mut">Friend requests and project invites show up here.</span></div>')+'</div>'}
@@ -577,6 +601,7 @@ document.addEventListener('click',e=>{if(me&&!$('notes').hidden&&!e.target.close
 addEventListener('keydown',e=>{if(e.key==='Escape'&&me)closeN()});
 $('notes').onclick=e=>{const b=e.target;if(b.id==='nclr'){setNotes(me.name,[]);return render()}
 if(b.dataset.ja){decideJoin(b.dataset.ja,b.dataset.v==='y',JR_ROLE[b.dataset.ja]);return}
+if(b.dataset.bo){go(DESIGN+'?p='+encodeURIComponent(b.dataset.bo));return}
 const id=b.dataset.na;if(!id)return;const l=notes(me.name),n=l.find(x=>x.id===id),yes=b.dataset.v==='y';n.done=b.dataset.v;n.read=1;setNotes(me.name,l);
 if(n.type==='friend_request'){if(yes){setFr(me.name,[...friends(me.name),n.from]);if(n.code)setInv(invL().map(x=>x.code===n.code?Object.assign(x,{n:(x.n||0)+1}):x))}enq(n.from,yes?'fr_acc':'fr_dec',{})}
 if(n.type==='project_invite'){const ps=rj('mc_projects',[]);let p=ps.find(q=>q.id===n.pid);
@@ -628,7 +653,7 @@ if(b.dataset.shi)navigator.share({title:'Join me on MiniCAD',text:'Open this lin
 if(b.dataset.rvi){setInv(invL().filter(x=>x.code!==b.dataset.rvi));renderPane()}
 if(b.dataset.chat)openChat(b.dataset.chat);
 if(b.dataset.more){CHATLIM[chatWith]=(CHATLIM[chatWith]||80)+200;renderPane()}
-if(b.dataset.rm&&confirm('Remove '+dn(b.dataset.rm)+'?')){const n=b.dataset.rm;setFr(me.name,friends(me.name).filter(x=>x!==n));enq(n,'fr_rm',{});ping();renderPane()}
+if(b.dataset.rm&&confirm(rmWarn(b.dataset.rm))){const n=b.dataset.rm;setFr(me.name,friends(me.name).filter(x=>x!==n));cutProjects(n,true,Date.now());enq(n,'fr_rm',{at:Date.now()});ping();render()}
 if(b.dataset.cancel){cancelReq(b.dataset.cancel);renderPane()}
 if(b.id==='mb')send()};
 $('pane').onkeydown=e=>{if(e.key==='Enter'&&e.target.id==='mt')send();if(e.key==='Enter'&&e.target.id==='fa')$('fb').click()};
@@ -661,7 +686,7 @@ const name=$('pn').value.trim();if(!name)return $('perr').textContent='Give the 
 /* live updates across tabs */
 addEventListener('storage',e=>{softRender();if(e.key==='mc_out')flush()});if(bc)bc.onmessage=()=>softRender();
 addEventListener('pageshow',e=>{if(e.persisted){me=getMe();boot()}});
-addEventListener('pagehide',()=>{if(me)netStop()});
+addEventListener('pagehide',()=>{if(me)netStop(!!window.__nav)});
 /* only touch the DOM when the markup really changed (keeps typing, scroll and focus; far fewer repaints) */
 (()=>{const d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');['mine','shared','pane','notes','jr'].forEach(id=>{const e=$(id);Object.defineProperty(e,'innerHTML',{configurable:true,get(){return d.get.call(e)},set(v){if(e._h===v)return;e._h=v;d.set.call(e,v)}})})})();
 boot();

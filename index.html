@@ -271,6 +271,7 @@ async function flush(){
  }catch(e){console.error(e)}finally{flushing=false;softRender();if(again){again=false;flush()}}}
 async function deliver(to,list){
  const c=await dial(to);if(!c)return [];
+ list=(await Promise.all(list.map(scnPrep))).filter(Boolean);if(!list.length){try{c.close()}catch(e){}return []}
  return new Promise(res=>{const got=[];let done=0,tm;
   const fin=()=>{if(done)return;done=1;clearTimeout(tm);try{c.close()}catch(e){}res(got)};
   tm=setTimeout(fin,10000);
@@ -305,8 +306,42 @@ function onConn(c){c.on('close',()=>{const p=c._pn&&PRES[c._pn];if(p&&p.inC===c)
  c.on('data',m=>{if(!me||!m)return;
  if(m.t==='bye'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n)gone(n);return}
  if(m.t==='ping'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n){const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};c._pn=n;p.inC=c;p.inAt=Date.now();p.seenAt=Date.now();try{c.send({t:'pong'})}catch(e){}presUI()}return}
- if(m.t==='knock')return onKnock(c,m);if(m.t!=='env')return;let ok=false;try{ok=handle(m.e,c.peer)}catch(x){console.error(x)}
+ if(m.t==='scq')return serveScene(c,m);if(m.t==='knock')return onKnock(c,m);if(m.t!=='env')return;let ok=false;try{ok=handle(m.e,c.peer)}catch(x){console.error(x)}
  if(ok){try{c.send({t:'ack',id:m.e.id})}catch(x){}softRender();ping()}})}
+/* ---- store-and-forward of project changes (kept in the outbox like messages until the member is online) ---- */
+const idb=()=>new Promise((res,rej)=>{try{const r=indexedDB.open('minicad',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('scenes'))r.result.createObjectStore('scenes')};r.onerror=()=>rej(r.error);r.onsuccess=()=>res(r.result)}catch(e){rej(e)}});
+const idbGet=async k=>{const db=await idb();return new Promise(res=>{try{const g=db.transaction('scenes','readonly').objectStore('scenes').get(k);g.onsuccess=()=>{db.close();res(g.result||null)};g.onerror=()=>{db.close();res(null)}}catch(e){res(null)}})};
+const idbPut=async(k,v)=>{const db=await idb();return new Promise(res=>{try{const t=db.transaction('scenes','readwrite');t.objectStore('scenes').put(v,k);t.oncomplete=()=>{db.close();res(1)};t.onerror=()=>{db.close();res(0)}}catch(e){res(0)}})};
+async function scnScan(){if(!me)return;
+ const sent=rj('mc_scn_sent',{});let ch=0;
+ for(const p of rj('mc_projects',[])){
+  const acc=(p.members||[]).filter(x=>x.status==='accepted');
+  const mem=[p.owner,...acc.map(x=>x.user)].filter(u=>u&&u!==me.name);
+  if(!mem.length||(p.owner!==me.name&&!acc.some(x=>x.user===me.name&&x.role!=='Viewer')))continue;
+  const r=await idbGet(p.id);if(!r||!r.objs||!r.objs.length||!r.ts)continue;
+  for(const u of mem){const k=p.id+'|'+u;if((sent[k]||0)>=r.ts)continue;
+   wj('mc_out',outL().filter(e=>!(e.from===me.name&&e.to===u&&e.k==='scn'&&e.d.pid===p.id)));
+   sent[k]=r.ts;ch=1;
+   wj('mc_out',[...outL(),{id:rid()+rid()+Date.now().toString(36),from:me.name,to:u,k:'scn',d:{pid:p.id,ts:r.ts},t:Date.now()}])}}
+ if(ch){wj('mc_scn_sent',sent);flush()}}
+async function scnPrep(e){if(e.k!=='scn')return e;const r=await idbGet(e.d.pid);return r&&r.objs&&r.objs.length?{...e,d:{pid:e.d.pid,ts:r.ts||e.d.ts,objs:r.objs,cam:r.cam}}:null}
+async function scnRecv(f,d){const p=rj('mc_projects',[]).find(x=>x.id===d.pid);if(!p||!Array.isArray(d.objs))return;
+ const m=(p.members||[]).find(x=>x.user===f);if(f!==p.owner&&!(m&&m.status==='accepted'&&m.role!=='Viewer'))return;
+ const ts=+d.ts||0,cur=await idbGet(p.id);if(cur&&(+cur.ts||0)>=ts)return;
+ await idbPut(p.id,{v:1,objs:d.objs,cam:d.cam||(cur&&cur.cam),ts});
+ const ps=rj('mc_projects',[]),q=ps.find(x=>x.id===p.id);if(q){q.updated=ts;wj('mc_projects',ps)}
+ const sent=rj('mc_scn_sent',{});sent[p.id+'|'+f]=Math.max(sent[p.id+'|'+f]||0,ts);wj('mc_scn_sent',sent);
+ pushNote(me.name,{type:'info',text:dn(f)+' updated \u201c'+p.name+'\u201d \u2014 latest version saved'});softRender()}
+/* serve the saved scene of a project to its members while this user is on the projects page (designer is closed) */
+const okSc=(peer,n)=>peer===pid(n)||new RegExp('^'+pid(n)+'-\\d{1,2}$').test(String(peer));
+function serveScene(c,m){const PID=String(m.pid||''),reply=(ts,d)=>{try{c.send({t:'scr',pid:PID,ts,d})}catch(e){}};
+ const p=me&&rj('mc_projects',[]).find(x=>x.id===PID);if(!p)return reply(0,null);
+ const mem=[p.owner,...(p.members||[]).filter(x=>x.status==='accepted').map(x=>x.user)];
+ if(!mem.includes(me.name)||!mem.some(u=>u!==me.name&&okSc(c.peer,u)))return reply(0,null);
+ try{const r=indexedDB.open('minicad',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('scenes'))r.result.createObjectStore('scenes')};
+  r.onerror=()=>reply(0,null);
+  r.onsuccess=()=>{try{const g=r.result.transaction('scenes','readonly').objectStore('scenes').get(PID);
+   g.onsuccess=()=>{const d=g.result;r.result.close();d&&d.objs&&d.objs.length?reply(+d.ts||+p.updated||0,d.objs):reply(0,null)};g.onerror=()=>reply(0,null)}catch(e){reply(0,null)}}}catch(e){reply(0,null)}}
 function handle(e,peer){
  if(!e||typeof e.id!=='string'||e.id.length>40||typeof e.k!=='string'||!/^[\w.~-]{2,40}$/.test(e.from||'')||e.to!==me.name||e.from===me.name||!okPeer(peer,e.from))return false;
  const seen=rj('mc_seen',[]);if(seen.includes(e.id))return true;wj('mc_seen',[e.id,...seen].slice(0,300));
@@ -332,6 +367,7 @@ function handle(e,peer){
   else if(isF&&d.owner===f&&mem.includes(me.name)&&mem.includes(f)){setGrp([...gs,{id:d.gid,name:nm,owner:f,members:mem,t:Date.now()}]);pushNote(me.name,{type:'info',text:dn(f)+' added you to the group \u201c'+nm+'\u201d'});toast('Added to group '+nm);chime()}}}
  else if(e.k==='gleave'){const gs=grpL(),g=gs.find(x=>x.id===d.gid);if(g&&g.members.includes(f)){g.members=g.members.filter(x=>x!==f);setGrp(gs);sysMsg('g:'+g.id,dn(f)+' left')}}
  else if(e.k==='gchat'){const g=grpL().find(x=>x.id===d.gid);if(g&&g.members.includes(f)&&g.members.includes(me.name)){addMsg(ckey('g:'+g.id),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now()});if(!(tab==='ms'&&chatWith==='g:'+g.id&&!document.hidden)){toast(dn(f)+' in '+g.name);chime()}}}
+ else if(e.k==='scn'){scnRecv(f,d).catch(x=>console.error(x))}
  else if(e.k==='presp'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===me.name),m=p&&p.members.find(q=>q.user===f);
   if(m){m.status=d.yes?'accepted':'declined';wj('mc_projects',ps);pushNote(me.name,{type:'info',text:`${dn(f)} ${d.yes?'joined':'declined'} "${p.name}"`})}}
  return true}
@@ -342,13 +378,13 @@ function sayBye(){try{Object.keys(PRES).forEach(n=>{const p=PRES[n];[p.c,p.inC].
 function netStop(){sayBye();clearInterval(NET.timer);NET.timer=0;NET.name=null;NET.open=false;NET.state='off';Object.keys(PRES).forEach(dropPres);if(NET.peer){try{NET.peer.destroy()}catch(e){}NET.peer=null}}
 function netStart(){if(!me||NET.name===me.name)return;netStop();NET.name=me.name;
  if(typeof Peer==='undefined'){NET.state='nolib';netUI();return}
- claim(1);NET.timer=setInterval(()=>{if(!me)return;if(NET.open){flush();presTick()}else if(Date.now()-NET.t>12000)claim(1)},8000)}
+ claim(1);NET.timer=setInterval(()=>{if(!me)return;if(NET.open){flush();presTick();window.__scT=(window.__scT||0)+1;if(window.__scT%4===0)scnScan().catch(()=>{})}else if(Date.now()-NET.t>12000)claim(1)},8000)}
 function claim(g){
  if(!me||!NET.name)return;if(NET.peer){try{NET.peer.destroy()}catch(e){}NET.peer=null}
  NET.open=false;NET.state='connecting';NET.t=Date.now();netUI();
  let p;try{p=new Peer(slotId(me.name,g),{...CFG.SIGNALING,config:{iceServers:[...CFG.ICE,...CFG.TURN]}})}catch(e){NET.state='err';netUI();return}
  NET.peer=p;
- p.on('open',()=>{if(NET.peer!==p)return;NET.open=true;NET.state='on';netUI();flush();presTick();if(JOIN.cur)joinTry()});
+ p.on('open',()=>{if(NET.peer!==p)return;NET.open=true;NET.state='on';netUI();scnScan().catch(()=>{});flush();presTick();if(JOIN.cur)joinTry()});
  p.on('connection',c=>{if(NET.peer===p)onConn(c)});
  p.on('disconnected',()=>{if(NET.peer!==p)return;NET.open=false;NET.state='connecting';netUI();try{p.reconnect()}catch(e){}});
  p.on('close',()=>{if(NET.peer===p){NET.open=false;NET.state='connecting';netUI()}});

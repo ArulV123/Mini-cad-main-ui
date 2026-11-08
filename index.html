@@ -72,7 +72,7 @@ svg.i{width:18px;height:18px}
 .lf .box{width:min(380px,100%);padding:30px;background:var(--p);border:1px solid var(--b);border-radius:20px;box-shadow:var(--sh)}.lf .box .mark{width:68px;height:68px;margin-bottom:14px}.lf h2{font-size:26px;text-transform:none;letter-spacing:-.02em;color:var(--t);margin:0 0 4px}
 .lf input{border-radius:12px}.lf button{border-radius:12px;margin-top:6px}
 /* header */
-header{position:sticky;top:0;z-index:30;padding:12px clamp(14px,2vw,24px);gap:12px;background:color-mix(in srgb,var(--p) 88%,transparent);backdrop-filter:blur(12px)}
+header{position:sticky;top:0;z-index:30;padding:12px clamp(14px,2vw,24px);gap:12px;background:var(--p)}
 .cta{height:38px;padding:0 16px;border-radius:11px;display:inline-flex;align-items:center;gap:7px;box-shadow:0 6px 18px -6px var(--a)}
 .bellb{position:relative;width:38px;height:38px;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--h);border:1px solid var(--b)}.bellb.ring svg{animation:rg 1.6s ease-in-out infinite;transform-origin:50% 0}@keyframes rg{0%,60%,100%{transform:none}70%{transform:rotate(14deg)}80%{transform:rotate(-12deg)}90%{transform:rotate(8deg)}}
 .dot{top:-3px;right:-3px;background:linear-gradient(135deg,#ff5a6a,#ff3d81);min-width:19px;height:19px}
@@ -83,7 +83,7 @@ header{position:sticky;top:0;z-index:30;padding:12px clamp(14px,2vw,24px);gap:12
 .nic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--h);color:var(--m)}.nic.uadd{background:#3b7cff22;color:var(--a)}.nic.cube{background:#7a4dff22;color:var(--a2)}
 .ni small{display:block;margin-top:2px}.na{display:flex;gap:6px;margin-top:9px}.nz{display:grid;justify-items:center;gap:4px;text-align:center;padding:40px 20px}.nz svg{width:30px;height:30px;color:var(--m);margin-bottom:6px}
 /* main + cards */
-main{padding:28px clamp(16px,3vw,40px);background:linear-gradient(var(--b) 1px,transparent 1px) 0 0/40px 40px,linear-gradient(90deg,var(--b) 1px,transparent 1px) 0 0/40px 40px;background-color:var(--bg);background-blend-mode:soft-light}
+main{padding:28px clamp(16px,3vw,40px);background:linear-gradient(color-mix(in srgb,var(--b) 50%,transparent) 1px,transparent 1px) 0 0/40px 40px,linear-gradient(90deg,color-mix(in srgb,var(--b) 50%,transparent) 1px,transparent 1px) 0 0/40px 40px;background-color:var(--bg)}
 .wel h1{font-size:30px;letter-spacing:-.025em}.wel button{height:38px;border-radius:11px;display:inline-flex;align-items:center;gap:7px}
 h2{display:flex;align-items:center;gap:8px}h2:after{content:"";flex:1;height:1px;background:var(--b)}
 .grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
@@ -96,13 +96,58 @@ h2{display:flex;align-items:center;gap:8px}h2:after{content:"";flex:1;height:1px
 .newt i{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;box-shadow:0 10px 24px -8px var(--a)}.newt i svg{width:24px;height:24px}.newt small{font-weight:400;color:var(--m)}
 aside{background:var(--p)}.tabs{margin:10px;padding:4px;background:var(--h);border-radius:12px}.tabs button{border-radius:9px}.tabs button.on{background:var(--p);box-shadow:var(--sh)}
 @media(max-width:820px){body{overflow:auto}.who b{display:none}.cta{padding:0 12px}#app{height:auto}header{position:sticky}}
+/* join by link: waiting room + host admit panel */
+#jw{position:fixed;inset:0;z-index:900;display:grid;place-items:center;padding:20px;background:var(--bg)}
+#jw .jc{width:min(420px,100%);text-align:center;padding:34px 28px;background:var(--p);border:1px solid var(--b);border-radius:22px;box-shadow:var(--sh)}
+.spin{width:46px;height:46px;border-radius:50%;border:4px solid var(--h);border-top-color:var(--a);margin:0 auto 18px;animation:spn .9s linear infinite}@keyframes spn{to{transform:rotate(360deg)}}
+#jr{position:fixed;right:max(14px,2vw);bottom:20px;z-index:500;display:grid;gap:10px;width:min(360px,calc(100vw - 28px))}#jr:empty{display:none}
+.jrc{display:flex;gap:12px;align-items:flex-start;padding:14px;background:var(--p);border:1px solid var(--b);border-radius:16px;box-shadow:0 18px 44px -12px #0007;animation:in .25s both}
+.jrc .av{width:38px;height:38px;font-size:15px}.jrc .sp{flex:1;min-width:0}.jrc .na{margin-top:9px}
+.jrc select,.ni select{height:28px;font-size:12px;padding:0 6px;border-radius:8px;width:auto}
+.bdg{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:9px;background:linear-gradient(135deg,#ff5a6a,#ff3d81);color:#fff;font-size:10.5px;font-weight:700;line-height:1;vertical-align:middle}.bdg[hidden]{display:none}
+.tabs button{display:inline-flex;align-items:center;justify-content:center}
+.msgs{overscroll-behavior:contain}
+.tg{display:block;margin-top:3px;font-size:10px;font-weight:700;letter-spacing:.04em;opacity:.75;text-transform:uppercase}
+.chat-r:hover{background:var(--h)}.chat-r .av{width:36px;height:36px;font-size:12px}
+/* ---- WhatsApp-style messages ---- */
+@keyframes slR{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes slL{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+@keyframes fdU{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes popm{0%{opacity:0;transform:translateY(10px) scale(.9)}100%{opacity:1;transform:none}}
+@keyframes rowin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.pane.a-r{animation:slR .28s cubic-bezier(.2,.8,.2,1) both}.pane.a-l{animation:slL .28s cubic-bezier(.2,.8,.2,1) both}.pane.a-f{animation:fdU .22s ease both}
+.pane.a-l .chat-r,.pane.a-f .chat-r{animation:rowin .32s cubic-bezier(.2,.8,.2,1) both}
+.pane.inchat{overflow:hidden;display:flex;flex-direction:column}.pane.inchat>.chat{flex:1;min-height:0}
+.chat{display:flex;flex-direction:column;height:100%}
+.chh{display:flex;align-items:center;gap:10px;padding:2px 0 10px}.chh .av{width:38px;height:38px;font-size:14px}.chh .sp{flex:1;min-width:0}.chh b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chh small{font-size:11.5px}
+.msgs{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:16px;background:color-mix(in srgb,var(--h) 75%,var(--p));overscroll-behavior:contain}
+.msg{max-width:84%;padding:7px 11px 5px;border-radius:14px 14px 14px 4px;background:var(--p);border:1px solid var(--b);box-shadow:0 1px 2px #0000000d;align-self:flex-start;word-break:break-word;transform-origin:0 100%}
+.msg.me{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border:0;border-radius:14px 14px 4px 14px;align-self:flex-end;transform-origin:100% 100%}
+.msg.pop{animation:popm .24s cubic-bezier(.2,.9,.3,1.2) both}
+.msg .snd{display:block;font-weight:700;font-size:12px;margin-bottom:1px}
+.msg .mm{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:3px}.msg .tm{margin-left:auto;font-size:10px;opacity:.6}
+.tg{display:inline-block;margin:0;padding:1px 8px;border-radius:9px;font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,#16a34a,#0d9488);opacity:1;line-height:1.5}
+.dsep{align-self:center;margin:6px 0 2px;font-size:11px}.dsep span{display:inline-block;background:var(--p);color:var(--m);padding:2px 11px;border-radius:10px;border:1px solid var(--b)}
+.sysm{align-self:center;font-size:11px;color:var(--m);background:var(--p);padding:2px 11px;border-radius:10px;border:1px solid var(--b)}
+.cin{display:flex;gap:8px;margin-top:10px;align-items:center}.cin input{height:42px;border-radius:21px;padding:0 16px}.cin button{width:42px;height:42px;border-radius:50%;padding:0;flex:none;display:grid;place-items:center}
+.sec{margin:16px 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--m);font-weight:700}
+.chat-r{gap:12px;padding:10px 8px;border:0;border-radius:14px;cursor:pointer;transition:background .15s,transform .15s}.chat-r:hover{background:var(--h)}.chat-r:active{transform:scale(.985)}
+.chat-r .av{width:44px;height:44px;font-size:14px;flex:none}.chat-r .ctop{display:flex;justify-content:space-between;gap:8px}.chat-r .ct{color:var(--m);font-size:11px;white-space:nowrap}
+.chat-r .cs{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--m)}.chat-r.un .ct{color:var(--a);font-weight:700}.chat-r.un .cs{color:var(--t);font-weight:600}
+.chat-r.pin{background:color-mix(in srgb,#16a34a 9%,transparent)}.chat-r.pin:hover{background:color-mix(in srgb,#16a34a 16%,transparent)}
+.ngb{display:flex;align-items:center;gap:12px;width:100%;height:auto;padding:10px 12px;margin:8px 0 0;text-align:left;border:1.5px dashed color-mix(in srgb,var(--a) 50%,var(--b));border-radius:14px;background:color-mix(in srgb,var(--a) 6%,transparent);color:var(--a);font-weight:600;line-height:1.3}
+.ngb i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;font-style:normal;font-size:22px;flex:none}.ngb small{display:block;font-weight:400;color:var(--m)}
+@media(max-width:820px){.pane.inchat>.chat{height:calc(100vh - 170px);min-height:380px}}
+@media(prefers-reduced-motion:reduce){.pane.a-r,.pane.a-l,.pane.a-f,.msg.pop,.chat-r{animation:none!important}}
 </style></head><body class="out">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mc" viewBox="0 0 64 64"><defs><linearGradient id="lgm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgm)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol><symbol id="i-uadd" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></symbol><symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></symbol></svg>
 <div id="veil" class="on"></div>
+<div id="jw" hidden></div>
+<div id="jr"></div>
 <section id="login" hidden class="view"><div class="hero"><div class="bp"></div><div class="hb"><svg class="mark"><use href="#mc"/></svg><span class="wm">Mini<b>CAD</b></span></div>
 <div><h1>Sketch it.<br>Gear it.<br><em>Build it together.</em></h1><p>A 3D designer in your browser, with gears, motors and live collaboration.</p>
 <ul class="feat"><li><svg class="i"><use href="#i-cube"/></svg><div><b>Real 3D modelling</b><span>Shapes, gears, booleans and STL export</span></div></li><li><svg class="i"><use href="#i-uadd"/></svg><div><b>Invite friends</b><span>Co-owners, builders, reviewers or viewers</span></div></li><li><svg class="i"><use href="#i-plus"/></svg><div><b>One click to start</b><span>Create a project and land straight in the designer</span></div></li></ul></div><div></div></div>
-<div class="lf"><div class="box"><svg class="mark"><use href="#mc"/></svg><h2>Welcome</h2><div class="mut">Pick a display name. Your unique link is created for you.</div><input id="un" maxlength="20" placeholder="Display name" autocomplete="username"><div class="err" id="lerr"></div><button class="pri" id="lgo">Continue</button><p class="mut" style="font-size:12px;margin:14px 0 0">No password. Stored on this device only.</p></div></div></section>
+<div class="lf"><div class="box"><svg class="mark"><use href="#mc"/></svg><h2>Welcome</h2><div class="mut">Pick a display name. Your unique link is created for you.</div><div id="ljn" hidden style="margin-top:12px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--a) 10%,transparent);color:var(--a);font-size:13px"></div><input id="un" maxlength="20" placeholder="Display name" autocomplete="username"><div class="err" id="lerr"></div><button class="pri" id="lgo">Continue</button><p class="mut" style="font-size:12px;margin:14px 0 0">No password. Stored on this device only.</p></div></div></section>
 <div id="app" hidden class="view">
 <header><div class="brand"><svg class="mark"><use href="#mc"/></svg><span class="wm">Mini<b>CAD</b></span></div>
 <button class="pri cta" id="newp"><svg class="i"><use href="#i-plus"/></svg>Create project</button>
@@ -111,7 +156,8 @@ aside{background:var(--p)}.tabs{margin:10px;padding:4px;background:var(--h);bord
 <div id="notes" hidden></div>
 <main><div class="wel"><h1 id="gr"></h1><button id="newf"><svg class="i"><use href="#i-uadd"/></svg>Create with friends</button></div>
 <h2>My projects</h2><div class="grid" id="mine"></div><h2>Shared with me</h2><div class="grid" id="shared"></div></main>
-<aside><div class="tabs"><button data-t="fr" class="on">Friends</button><button data-t="ms">Messages</button><button data-t="ac">Account</button></div><div class="pane" id="pane"></div></aside></div>
+<aside><div class="tabs"><button data-t="fr" class="on">Friends</button><button data-t="ms">Messages<span class="bdg" id="bms" hidden></span></button><button data-t="ac">Account</button></div><div class="pane" id="pane"></div></aside></div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 const DESIGN='https://arulv123.github.io/Mini-Cad/'; // the live designer; opened in the same tab with ?p=<project id>
 const $=i=>document.getElementById(i),veil=$('veil');
@@ -119,8 +165,9 @@ const rj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){retu
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rid=()=>{try{const a=new Uint8Array(6);crypto.getRandomValues(a);return [...a].map(x=>(x%36).toString(36)).join('')}catch(e){return Math.random().toString(36).slice(2,8)}},dn=h=>String(h||'').split('~')[0],fmt=t=>new Date(t).toLocaleString([], {dateStyle:'medium',timeStyle:'short'});
 const ROLES=['Co-owner','Builder','Reviewer','Viewer'];
-let me=rj('mc_me',null),tab='fr',chatWith=null;
-try{const q0=new URLSearchParams(location.search);if(q0.get('add')||q0.get('join'))sessionStorage.setItem('mc_pend',location.search)}catch(e){}
+const getMe=()=>{try{const s=JSON.parse(sessionStorage.getItem('mc_tab'));if(s&&s.name)return s}catch(e){}return rj('mc_me',null)};
+let me=getMe(),tab='fr',chatWith=null;
+const capLink=()=>{try{const h=location.hash.replace(/^#/,''),s=location.search.replace(/^\?/,''),raw=[h,s].find(x=>/(^|&)(add|join|inv)=/.test(x));if(raw)sessionStorage.setItem('mc_pend','?'+raw)}catch(e){}};capLink();
 const bc=window.BroadcastChannel?new BroadcastChannel('minicad'):null;
 const ping=()=>{bc&&bc.postMessage(1)};
 const go=u=>{veil.style.transition='none';veil.classList.add('on');location.assign(u)};
@@ -129,49 +176,344 @@ const show=()=>{veil.style.transition='';veil.classList.remove('on');veil.style.
 /* unique links: your personal link, project links, and opening them */
 const toast=t=>{let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';e.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--t);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:1000;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:opacity .25s;pointer-events:none';document.body.appendChild(e)}e.textContent=t;e.style.opacity=1;clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity=0,2400)};
 const copy=async t=>{try{await navigator.clipboard.writeText(t)}catch(e){const i=document.createElement('textarea');i.value=t;document.body.appendChild(i);i.select();try{document.execCommand('copy')}catch(x){}i.remove()}toast('Link copied')};
-const base=()=>location.origin+location.pathname;
-const myLink=()=>base()+'?add='+encodeURIComponent(me.name);
-const projLink=p=>base()+'?join='+encodeURIComponent(p.id)+'&o='+encodeURIComponent(p.owner)+'&n='+encodeURIComponent(p.name);
+const base=()=>/^https?:/.test(location.href)?location.origin+location.pathname.replace(/index\.html$/,''):CFG.PUBLIC_URL.split('#')[0].split('?')[0];
+const myLink=()=>base()+'#add='+encodeURIComponent(me.name);
+const projLink=p=>base()+'#join='+encodeURIComponent(p.id)+'&o='+encodeURIComponent(p.owner)+'&n='+encodeURIComponent(p.name);
 function linkIn(){const s=sessionStorage.getItem('mc_pend');if(!s||!me)return;sessionStorage.removeItem('mc_pend');try{history.replaceState(null,'',location.pathname)}catch(e){}
-const q=new URLSearchParams(s),a=q.get('add'),j=q.get('join');
+const q=new URLSearchParams(s),a=q.get('add'),j=q.get('join'),iv=q.get('inv'),iu=q.get('u');
+if(iv){if(!/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(iv)||!/^[\w.~-]{2,40}$/.test(iu||''))return toast('That link is not valid');
+if(iu===me.name)return toast('That is your own link');
+tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));const r=addFriend(iu,iv);render();return toast(r)}
 if(a){if(!/^[\w.~-]{2,40}$/.test(a))return toast('That link is not valid');
 if(a===me.name)return toast('That is your own link');
-if(!friends(me.name).includes(a)){setFr(me.name,[...friends(me.name),a]);setFr(a,[...friends(a),me.name]);ping()}
-tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));render();return toast('Connected with '+dn(a))}
+tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));const r=addFriend(a);render();return toast(r)}
 if(j){if(!/^[\w-]{3,40}$/.test(j))return toast('That link is not valid');
-const o=/^[\w.~-]{2,40}$/.test(q.get('o')||'')?q.get('o'):'',n=(q.get('n')||'Shared project').slice(0,40),ps=rj('mc_projects',[]);let pr=ps.find(x=>x.id===j);
-if(!pr){pr={id:j,name:n,owner:o,members:[],allowHostLeave:true,created:Date.now()};ps.push(pr)}
-if(pr.owner!==me.name&&!pr.members.some(m=>m.user===me.name))pr.members.push({user:me.name,role:'Builder',status:'accepted'});
-wj('mc_projects',ps);go(DESIGN+'?p='+encodeURIComponent(j))}}
+const o=/^[\w.~-]{2,40}$/.test(q.get('o')||'')?q.get('o'):'',n=(q.get('n')||'Shared project').slice(0,40);
+if(!o)return toast('That link is missing its host');
+const pr=rj('mc_projects',[]).find(x=>x.id===j);
+if(o===me.name||(pr&&(pr.owner===me.name||pr.members.some(m=>m.user===me.name&&m.status==='accepted'))))return go(DESIGN+'?p='+encodeURIComponent(j));
+requestJoin(j,o,n)}}
 
 /* data helpers (all in localStorage; keyed by username so a backend/WebRTC layer can replace them later) */
-const friends=u=>rj('mc_friends',{})[u]||[];
-const setFr=(u,l)=>{const f=rj('mc_friends',{});f[u]=[...new Set(l)];wj('mc_friends',f)};
+const friends=u=>{const a=rj('mc_friends',{})[u]||[];return a.length?a:(rj('mc_friends_bak',{})[u]||[])};
+const setFr=(u,l)=>{l=[...new Set(l)];const f=rj('mc_friends',{}),b=rj('mc_friends_bak',{});f[u]=l;b[u]=l;wj('mc_friends',f);wj('mc_friends_bak',b);setTimeout(()=>{try{presTick()}catch(e){}},300)};
 const notes=u=>rj('mc_notes',{})[u]||[];
 const pushNote=(u,n)=>{const a=rj('mc_notes',{});(a[u]=a[u]||[]).unshift(Object.assign({id:rid(),t:Date.now(),read:0},n));wj('mc_notes',a);ping()};
 const setNotes=(u,l)=>{const a=rj('mc_notes',{});a[u]=l;wj('mc_notes',a)};
 const pkey=(a,b)=>[a,b].sort().join('|');
 
+
+/* ===== peer-to-peer layer (PeerJS – same approach as Vibeo Meet) =====
+   * Every user listens on a PeerJS id made from their unique name. If the server still holds that id
+     (stale after a reload) the next "slot" is used (-2, -3 …), exactly like Vibeo's meeting slots; anyone
+     who wants to reach the user scans the slots.
+   * Invite links are permanent (like a meeting code): they never expire and work for any number of friends
+     until YOU remove them. Friends who open one while you are offline keep retrying until you are back.
+   * Friend requests, accepts, messages and project invites go through an outbox that retries until the
+     other person acknowledges it. Online / offline status comes from a small ping between friends.
+   This page only touches mc_* storage keys and 'mcad-' peer ids; Vibeo Meet uses its own vibeo- / vibeo_ names. */
+const CFG={PUBLIC_URL:'https://arulv123.github.io/Mini-cad-main-ui/' /* main link of this page */,SIGNALING:{},ICE:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],TURN:[]},TTL=30*864e5,SLOTS=8;
+const pid=n=>'mcad-'+[...String(n)].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join('');
+const slotId=(n,g)=>pid(n)+(g>1?'-'+g:'');
+const okPeer=(peer,n)=>{const p=pid(n);return peer===p||new RegExp('^'+p+'-\\d{1,2}$').test(String(peer))};
+const NET={peer:null,open:false,name:null,pend:{},timer:0,state:'off',t:0},PRES={};
+const outL=()=>rj('mc_out',[]).filter(e=>Date.now()-e.t<TTL),sentL=()=>me?(rj('mc_sent',{})[me.name]||[]).filter(e=>Date.now()-e.t<TTL):[],
+setSent=l=>{const a=rj('mc_sent',{});a[me.name]=l;wj('mc_sent',a)};
+function enq(to,k,d){const e={id:rid()+rid()+Date.now().toString(36),from:me.name,to,k,d:d||{},t:Date.now()};wj('mc_out',[...outL(),e]);flush();return e}
+function addFriend(a,code){
+ if(friends(me.name).includes(a))return dn(a)+' is already your friend';
+ const l=notes(me.name),inc=l.find(x=>x.type==='friend_request'&&x.from===a&&!x.done);
+ if(inc){inc.done='y';inc.read=1;setNotes(me.name,l);setFr(me.name,[...friends(me.name),a]);enq(a,'fr_acc',{});return 'Connected with '+dn(a)}
+ if(!sentL().some(x=>x.to===a))setSent([...sentL(),{to:a,t:Date.now()}]);
+ if(code||!outL().some(e=>e.from===me.name&&e.to===a&&e.k==='fr_req'))enq(a,'fr_req',code?{code}:{});else flush();
+ return 'Friend request sent to '+dn(a)}
+function cancelReq(to){setSent(sentL().filter(x=>x.to!==to));wj('mc_out',outL().filter(e=>!(e.from===me.name&&e.to===to&&e.k==='fr_req')))}
+
+/* permanent invite links */
+const genCode=()=>{const c='abcdefghijkmnpqrstuvwxyz',r=n=>{let s='';const a=new Uint8Array(n);crypto.getRandomValues(a);a.forEach(x=>s+=c[x%c.length]);return s};return r(3)+'-'+r(4)+'-'+r(3)};
+const invL=()=>me?(rj('mc_inv',{})[me.name]||[]):[],setInv=l=>{const a=rj('mc_inv',{});a[me.name]=l;wj('mc_inv',a)};
+const invLink=c=>base()+'#inv='+c+'&u='+encodeURIComponent(me.name);
+const invRows=()=>{const l=invL();return l.length?'<label class="l">Your invite links <small class="mut">(never expire)</small></label>'+l.map(x=>`<div class="row"><span class="sp"><code style="word-break:break-all;font-size:11px">${esc(invLink(x.code))}</code><small class="mut" style="display:block">${x.n?fmtN(x.n)+' friend'+(x.n>1?'s':'')+' joined':'Not used yet'}</small></span><button class="sm" data-cpi="${esc(x.code)}">Copy</button>${navigator.share?`<button class="sm" data-shi="${esc(x.code)}">Share</button>`:''}<button class="sm bad" data-rvi="${esc(x.code)}" title="Delete this link">\u2715</button></div>`).join(''):''};
+const pendRows=()=>{const s=sentL();return s.length?'<label class="l">Pending requests</label>'+s.map(x=>`<div class="row"><span class="av s">${esc(dn(x.to)[0]||'?')}</span><span class="sp">${esc(dn(x.to))}<small class="mut" style="display:block">${x.ok?'Delivered \u2013 waiting for them to accept':'Waiting for them to come online\u2026'}</small></span><button class="sm" data-cancel="${esc(x.to)}">Cancel</button></div>`).join(''):''};
+
+/* status labels */
+function netUI(){const e=document.getElementById('nst');if(!e)return;const s=NET.state;
+ e.textContent=s==='on'?'\u25CF You are online \u2013 friends can reach you live':s==='nolib'?'\u25CB Could not load the connection library \u2013 check your internet':s==='err'?'\u25CB Connection problem \u2013 retrying':'\u25CB Connecting\u2026';
+ e.style.color=s==='on'?'#1fa971':''}
+const isOn=n=>{const p=PRES[n];return !!p&&(!!p.on||Date.now()-(p.inAt||0)<(document.hidden?9e4:25e3))};
+function presLabel(n){if(isOn(n))return '<b style="color:#1fa971">\u25CF</b> Online';const p=PRES[n]||{},t=Math.max(p.seenAt||0,p.inAt||0,(rj('mc_ls',{})[me.name+'|'+n])||0);
+ return '<b style="color:#98a2b3">\u25CF</b> Offline'+(t?' \u00B7 last seen '+ago(t):'')}
+function presUI(){if(!me)return;document.querySelectorAll('[data-pst]').forEach(e=>{e.innerHTML=presLabel(e.dataset.pst)})}
+let rT=0,rDirty=0;
+function softRender(){if(rT)return;rT=setTimeout(()=>{rT=0;if(document.hidden){rDirty=1;return}doSoft()},150)}
+function doSoft(){if(!me)return;const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&$('pane').contains(a)){prep();renderProjects();renderNotes();netUI();presUI();return}render()}
+
+/* scan a user's slots and return the first open connection (null if nobody answers) */
+const addPend=(id,f)=>(NET.pend[id]=NET.pend[id]||[]).push(f),rmPend=(id,f)=>{const a=NET.pend[id];if(a){const i=a.indexOf(f);if(i>-1)a.splice(i,1);if(!a.length)delete NET.pend[id]}};
+function dial(name){return new Promise(res=>{let g=1,done=0;
+ const next=()=>{if(done)return;if(!NET.peer||!NET.open||g>SLOTS){done=1;return res(null)}
+  const id=slotId(name,g++);let c,to,failed=0;
+  const fail=()=>{if(failed||done)return;failed=1;clearTimeout(to);rmPend(id,fail);try{c&&c.close()}catch(e){}next()};
+  try{c=NET.peer.connect(id,{reliable:true})}catch(e){return next()}
+  to=setTimeout(fail,4000);addPend(id,fail);
+  c.on('open',()=>{if(failed||done)return;done=1;clearTimeout(to);rmPend(id,fail);res(c)});
+  c.on('error',fail);c.on('close',fail)};
+ next()})}
+
+/* outbox delivery */
+let flushing=false,again=false;
+async function flush(){
+ if(flushing){again=true;return}if(!me||!NET.open)return;flushing=true;
+ try{const by={};outL().filter(e=>e.from===me.name).forEach(e=>(by[e.to]=by[e.to]||[]).push(e));const to=Object.keys(by);
+  for(let i=0;i<to.length;i+=4)await Promise.all(to.slice(i,i+4).map(async u=>{const ok=await deliver(u,by[u].slice(0,25));if(!ok.length||!me)return;
+   wj('mc_out',outL().filter(e=>!ok.includes(e.id)));
+   if(by[u].some(e=>ok.includes(e.id)&&e.k==='fr_req'))setSent(sentL().map(x=>x.to===u?Object.assign(x,{ok:1}):x))}))
+ }catch(e){console.error(e)}finally{flushing=false;softRender();if(again){again=false;flush()}}}
+async function deliver(to,list){
+ const c=await dial(to);if(!c)return [];
+ return new Promise(res=>{const got=[];let done=0,tm;
+  const fin=()=>{if(done)return;done=1;clearTimeout(tm);try{c.close()}catch(e){}res(got)};
+  tm=setTimeout(fin,10000);
+  c.on('data',m=>{if(m&&m.t==='ack'){got.push(m.id);if(got.length>=list.length)fin()}});
+  c.on('close',fin);c.on('error',fin);
+  list.forEach(e=>{try{c.send({t:'env',e})}catch(x){}})})}
+
+/* presence: ping every friend, they answer with pong */
+function setOn(n,on){const p=PRES[n];if(!p)return;if(on)p.seenAt=Date.now();
+ if(p.on&&!on){const a=rj('mc_ls',{});a[me.name+'|'+n]=p.seenAt||Date.now();wj('mc_ls',a)}
+ if(p.on!==on){p.on=on;presUI()}}
+function dropPres(n){const p=PRES[n];if(p&&p.c){try{p.c.close()}catch(e){}}delete PRES[n]}
+async function connectPres(n,p){p.busy=1;const c=await dial(n);p.busy=0;
+ if(!c){p.fail=(p.fail||0)+1;p.next=Date.now()+Math.min(6000*p.fail,30000);setOn(n,false);return}
+ p.fail=0;p.c=c;p.at=Date.now();
+ c.on('data',m=>{if(m&&m.t==='pong'){p.at=Date.now();setOn(n,true)}else if(m&&m.t==='bye')gone(n)});
+ c.on('close',()=>{if(p.c===c){p.c=null;setOn(n,false);p.next=Date.now()+2000;presUI()}});
+ c.on('error',()=>{});
+ try{c.send({t:'ping'})}catch(e){}}
+function presTick(){
+ if(!me||!NET.open)return;const fl=friends(me.name);
+ Object.keys(PRES).forEach(n=>{if(!fl.includes(n))dropPres(n)});
+ fl.forEach(n=>{const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};
+  if(p.c&&p.c.open){
+   if(!document.hidden&&Date.now()-p.at>25000){setOn(n,false);try{p.c.close()}catch(e){}p.c=null}
+   else try{p.c.send({t:'ping'})}catch(e){}}
+  if((!p.c||!p.c.open)&&!p.busy&&Date.now()>=p.next)connectPres(n,p)});
+ presUI()}
+
+/* incoming */
+function onConn(c){c.on('close',()=>{const p=c._pn&&PRES[c._pn];if(p&&p.inC===c){p.inC=null;p.inAt=0;presUI()}});
+ c.on('data',m=>{if(!me||!m)return;
+ if(m.t==='bye'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n)gone(n);return}
+ if(m.t==='ping'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n){const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};c._pn=n;p.inC=c;p.inAt=Date.now();p.seenAt=Date.now();try{c.send({t:'pong'})}catch(e){}presUI()}return}
+ if(m.t==='knock')return onKnock(c,m);if(m.t!=='env')return;let ok=false;try{ok=handle(m.e,c.peer)}catch(x){console.error(x)}
+ if(ok){try{c.send({t:'ack',id:m.e.id})}catch(x){}softRender();ping()}})}
+function handle(e,peer){
+ if(!e||typeof e.id!=='string'||e.id.length>40||typeof e.k!=='string'||!/^[\w.~-]{2,40}$/.test(e.from||'')||e.to!==me.name||e.from===me.name||!okPeer(peer,e.from))return false;
+ const seen=rj('mc_seen',[]);if(seen.includes(e.id))return true;wj('mc_seen',[e.id,...seen].slice(0,300));
+ const f=e.from,d=e.d||{},fl=friends(me.name),isF=fl.includes(f),asked=sentL().some(x=>x.to===f);
+ if(e.k==='fr_req'){
+  const iv=d.code?invL().find(x=>x.code===d.code):null;
+  if(d.code&&!iv&&!isF)enq(f,'fr_dec',{why:'link'});
+  else if(iv&&!isF){if(!notes(me.name).some(x=>x.type==='friend_request'&&x.from===f&&!x.done)){pushNote(me.name,{type:'friend_request',from:f,code:iv.code});chime();toast(dn(f)+' wants to connect with you')}}
+  else if(isF)enq(f,'fr_acc',{});
+  else if(asked){setFr(me.name,[...fl,f]);setSent(sentL().filter(x=>x.to!==f));enq(f,'fr_acc',{});pushNote(me.name,{type:'info',text:'You and '+dn(f)+' are now friends'})}
+  else if(!notes(me.name).some(x=>x.type==='friend_request'&&x.from===f&&!x.done))pushNote(me.name,{type:'friend_request',from:f})}
+ else if(e.k==='fr_acc'){if(asked){setFr(me.name,[...fl,f]);setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:dn(f)+' accepted your friend request'})}}
+ else if(e.k==='fr_dec'){if(asked){setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:d.why==='link'?'The invite link from '+dn(f)+' is no longer valid':dn(f)+' declined your friend request'})}}
+ else if(e.k==='fr_rm'){if(isF)setFr(me.name,fl.filter(x=>x!==f))}
+ else if(e.k==='chat'){if(isF){addMsg(pkey(me.name,f),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now(),tag:d.tag==='all'?'all':undefined});if(!(tab==='ms'&&chatWith===f&&!document.hidden)){toast('New message from '+dn(f));chime()}}}
+ else if(e.k==='pinv'){if(isF&&/^[\w-]{3,40}$/.test(d.pid||''))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer'})}
+ else if(e.k==='jadm'){const key=(d.pid||'')+'|'+f;if(jaskL().includes(key)&&/^[\w-]{3,40}$/.test(d.pid||'')){const j=JOIN.cur&&JOIN.cur.pid===d.pid&&JOIN.cur.owner===f?JOIN.cur:null;
+  if(d.yes){if(j)finishJoin(j,d.role);else{addShared(d.pid,String(d.name||'Project').slice(0,40),f,d.role);jaskSet(jaskL().filter(x=>x!==key));pushNote(me.name,{type:'info',text:dn(f)+' let you into \u201c'+String(d.name||'Project').slice(0,40)+'\u201d'})}}
+  else{if(j)joinDenied(j);else jaskSet(jaskL().filter(x=>x!==key))}}}
+ else if(e.k==='gsync'){if(/^[\w-]{3,40}$/.test(d.gid||'')){const mem=cleanMem(d.members),gs=grpL(),g=gs.find(x=>x.id===d.gid),nm=String(d.name||'Group').slice(0,30);
+  if(g){if(g.owner===f){if(!mem.includes(me.name)){setGrp(gs.filter(x=>x.id!==g.id));dropGroupData(g.id);if(chatWith==='g:'+g.id)chatWith=null;pushNote(me.name,{type:'info',text:'You are no longer in \u201c'+g.name+'\u201d'})}
+    else{g.name=nm;g.members=mem;if(mem.includes(d.owner))g.owner=d.owner;setGrp(gs)}}}
+  else if(isF&&d.owner===f&&mem.includes(me.name)&&mem.includes(f)){setGrp([...gs,{id:d.gid,name:nm,owner:f,members:mem,t:Date.now()}]);pushNote(me.name,{type:'info',text:dn(f)+' added you to the group \u201c'+nm+'\u201d'});toast('Added to group '+nm);chime()}}}
+ else if(e.k==='gleave'){const gs=grpL(),g=gs.find(x=>x.id===d.gid);if(g&&g.members.includes(f)){g.members=g.members.filter(x=>x!==f);setGrp(gs);sysMsg('g:'+g.id,dn(f)+' left')}}
+ else if(e.k==='gchat'){const g=grpL().find(x=>x.id===d.gid);if(g&&g.members.includes(f)&&g.members.includes(me.name)){addMsg(ckey('g:'+g.id),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now()});if(!(tab==='ms'&&chatWith==='g:'+g.id&&!document.hidden)){toast(dn(f)+' in '+g.name);chime()}}}
+ else if(e.k==='presp'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===me.name),m=p&&p.members.find(q=>q.user===f);
+  if(m){m.status=d.yes?'accepted':'declined';wj('mc_projects',ps);pushNote(me.name,{type:'info',text:`${dn(f)} ${d.yes?'joined':'declined'} "${p.name}"`})}}
+ return true}
+
+/* own connection: claim slot 1, fall back to the next slot if the server still holds a stale id */
+function gone(n){const p=PRES[n];if(!p)return;p.inAt=0;p.at=0;const c=p.c;p.c=null;try{c&&c.close()}catch(e){}if(p.inC){try{p.inC.close()}catch(e){}p.inC=null}setOn(n,false);p.next=Date.now()+5000;presUI()}
+function sayBye(){try{Object.keys(PRES).forEach(n=>{const p=PRES[n];[p.c,p.inC].forEach(c=>{if(c&&c.open)try{c.send({t:'bye'})}catch(x){}})})}catch(x){}}
+function netStop(){sayBye();clearInterval(NET.timer);NET.timer=0;NET.name=null;NET.open=false;NET.state='off';Object.keys(PRES).forEach(dropPres);if(NET.peer){try{NET.peer.destroy()}catch(e){}NET.peer=null}}
+function netStart(){if(!me||NET.name===me.name)return;netStop();NET.name=me.name;
+ if(typeof Peer==='undefined'){NET.state='nolib';netUI();return}
+ claim(1);NET.timer=setInterval(()=>{if(!me)return;if(NET.open){flush();presTick()}else if(Date.now()-NET.t>12000)claim(1)},8000)}
+function claim(g){
+ if(!me||!NET.name)return;if(NET.peer){try{NET.peer.destroy()}catch(e){}NET.peer=null}
+ NET.open=false;NET.state='connecting';NET.t=Date.now();netUI();
+ let p;try{p=new Peer(slotId(me.name,g),{...CFG.SIGNALING,config:{iceServers:[...CFG.ICE,...CFG.TURN]}})}catch(e){NET.state='err';netUI();return}
+ NET.peer=p;
+ p.on('open',()=>{if(NET.peer!==p)return;NET.open=true;NET.state='on';netUI();flush();presTick();if(JOIN.cur)joinTry()});
+ p.on('connection',c=>{if(NET.peer===p)onConn(c)});
+ p.on('disconnected',()=>{if(NET.peer!==p)return;NET.open=false;NET.state='connecting';netUI();try{p.reconnect()}catch(e){}});
+ p.on('close',()=>{if(NET.peer===p){NET.open=false;NET.state='connecting';netUI()}});
+ p.on('error',err=>{if(NET.peer!==p)return;
+  if(err.type==='peer-unavailable'){const m=/peer\s+(\S+)/.exec(err.message||''),a=m&&NET.pend[m[1]];if(a)[...a].forEach(f=>f());return}
+  if(err.type==='unavailable-id'){try{p.destroy()}catch(e){}NET.peer=null;NET.open=false;
+   if(g<SLOTS)setTimeout(()=>{if(NET.name&&!NET.peer)claim(g+1)},300);else{NET.state='err';netUI()}return}
+  NET.open=false;NET.state=err.type==='network'||err.type==='server-error'||err.type==='socket-error'?'err':'connecting';netUI()})}
+addEventListener('hashchange',()=>{capLink();if(me)linkIn()});
+addEventListener('online',()=>{if(NET.name)claim(1)});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&rDirty){rDirty=0;doSoft()}else if(!document.hidden&&me&&tab==='ms')doSoft();if(!document.hidden&&NET.name){if(NET.open){flush();presTick()}else if(Date.now()-NET.t>4000)claim(1)}});
+
+/* ===== join by project link: knock -> waiting room -> host admits (same idea as Vibeo Meet) ===== */
+const JOIN={cur:null},LOBBY={},JR_ROLE={};
+const jaskL=()=>me?(rj('mc_jasked',{})[me.name]||[]):[],jaskSet=l=>{const a=rj('mc_jasked',{});a[me.name]=l;wj('mc_jasked',a)};
+const setJD=t=>{const e=$('jwd');if(e)e.textContent=t};
+const chime=()=>{try{const A=window.AudioContext||window.webkitAudioContext,a=chime.a=chime.a||new A(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1175,t+.12);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.15,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.45);o.start();o.stop(t+.5)}catch(e){}};
+function joinUI(t,s,opt){opt=opt||{};const w=$('jw');w.hidden=false;
+ w.innerHTML=`<div class="jc">${opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small><button id="jwc" class="${opt.bad?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad?'Back to projects':'Cancel'}</button></div>`;
+ $('jwc').onclick=leaveJoin}
+function leaveJoin(){const j=JOIN.cur;JOIN.cur=null;if(j){clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner))}$('jw').hidden=true;try{history.replaceState(null,'',location.pathname)}catch(e){}}
+function requestJoin(pid,owner,name){
+ if(JOIN.cur&&JOIN.cur.pid===pid)return;leaveJoin();
+ const j=JOIN.cur={pid,owner,name,c:null,t:0,t0:Date.now()};
+ jaskSet([...jaskL().filter(x=>x!==pid+'|'+owner),pid+'|'+owner]);
+ joinUI('Asking to join\u2026','Contacting <b>'+esc(dn(owner))+'</b> about <b>'+esc(name)+'</b>');
+ joinTry()}
+function joinTry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);
+ const retry=ms=>{if(JOIN.cur===j){clearTimeout(j.t);j.t=setTimeout(joinTry,ms)}};
+ if(!NET.open){setJD('Connecting to the network\u2026');return retry(500)}
+ dial(j.owner).then(c=>{if(JOIN.cur!==j){try{c&&c.close()}catch(e){}return}
+  if(!c){setJD('The host is not online yet \u2013 still trying ('+Math.round((Date.now()-j.t0)/1000)+'s)');return retry(3000)}
+  j.c=c;
+  c.on('data',m=>{if(JOIN.cur!==j||!m)return;
+   if(m.t==='wait')joinUI('Waiting for the host\u2026','<b>'+esc(dn(j.owner))+'</b> has been asked. You will get in as soon as they admit you.');
+   else if(m.t==='welcome')finishJoin(j,m.role);
+   else if(m.t==='denied')joinDenied(j,m.reason)});
+  c.on('close',()=>{if(JOIN.cur===j&&j.c===c){j.c=null;setJD('Reconnecting to the host\u2026');retry(2000)}});c.on('error',()=>{});
+  try{c.send({t:'knock',name:me.name,pid:j.pid,pn:j.name})}catch(e){retry(1500)}})}
+function addShared(pid,name,owner,role){const ps=rj('mc_projects',[]);let p=ps.find(x=>x.id===pid);
+ if(!p){p={id:pid,name,owner,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}
+ let m=p.members.find(x=>x.user===me.name);if(!m){m={user:me.name};p.members.push(m)}m.role=ROLES.includes(role)?role:'Builder';m.status='accepted';wj('mc_projects',ps)}
+function finishJoin(j,role){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}
+ addShared(j.pid,j.name,j.owner,role);jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
+ joinUI('You are in!','Opening the designer\u2026',{nobtn:1});setTimeout(()=>go(DESIGN+'?p='+encodeURIComponent(j.pid)),700)}
+function joinDenied(j,why){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
+ joinUI('Request declined',esc(why||'The host did not let you in.'),{bad:1})}
+
+/* host side: someone knocked on a project link */
+function onKnock(c,m){
+ if(!me||!/^[\w.~-]{2,40}$/.test(m.name||'')||m.name===me.name||!okPeer(c.peer,m.name)||!/^[\w-]{3,40}$/.test(m.pid||''))return;
+ const p=rj('mc_projects',[]).find(x=>x.id===m.pid&&x.owner===me.name);
+ if(!p){try{c.send({t:'denied',reason:'This project is no longer available.'})}catch(e){}return}
+ const mem=p.members.find(x=>x.user===m.name);
+ if(mem&&mem.status==='accepted'){try{c.send({t:'welcome',role:mem.role})}catch(e){}return}
+ const k=m.pid+'|'+m.name;LOBBY[k]=c;
+ c.on('close',()=>{if(LOBBY[k]!==c)return;delete LOBBY[k];setTimeout(()=>{if(!me||LOBBY[k])return;setNotes(me.name,notes(me.name).filter(x=>!(x.type==='join_request'&&x.from===m.name&&x.pid===m.pid&&!x.done)));render()},20000)});
+ try{c.send({t:'wait'})}catch(e){}
+ const l=notes(me.name),ex=l.find(x=>x.type==='join_request'&&x.from===m.name&&x.pid===m.pid&&!x.done);
+ if(ex){ex.t=Date.now();setNotes(me.name,l)}
+ else{pushNote(me.name,{type:'join_request',from:m.name,pid:m.pid,name:p.name});chime();toast(dn(m.name)+' is asking to join \u201c'+p.name+'\u201d')}
+ softRender()}
+function decideJoin(id,yes,role){const l=notes(me.name),n=l.find(x=>x.id===id&&x.type==='join_request');if(!n||n.done)return;
+ role=ROLES.includes(role)?role:'Builder';n.done=yes?'y':'n';n.read=1;setNotes(me.name,l);
+ const ps=rj('mc_projects',[]),p=ps.find(x=>x.id===n.pid&&x.owner===me.name);
+ if(p){let m=p.members.find(x=>x.user===n.from);if(yes){if(!m){m={user:n.from};p.members.push(m)}m.role=role;m.status='accepted'}else if(m&&m.status!=='accepted')m.status='declined';wj('mc_projects',ps)}
+ const k=n.pid+'|'+n.from,c=LOBBY[k];delete LOBBY[k];let sent=false;
+ if(c&&c.open){try{c.send(yes?{t:'welcome',role}:{t:'denied',reason:'The host did not let you in.'});sent=true}catch(e){}}
+ if(c&&!yes)setTimeout(()=>{try{c.close()}catch(e){}},800);
+ if(yes||!sent)enq(n.from,'jadm',{pid:n.pid,name:n.name,yes:yes?1:0,role});
+ ping();render()}
+const roleSel=id=>`<select data-jrole="${id}">${ROLES.map(r=>`<option${(JR_ROLE[id]||'Builder')===r?' selected':''}>${r}</option>`).join('')}</select>`;
+let jrSig='';
+function renderJR(l){const q=l.filter(x=>x.type==='join_request'&&!x.done),sig=q.map(x=>x.id).join();if(sig===jrSig)return;jrSig=sig;
+ $('jr').innerHTML=q.map(x=>`<div class="jrc"><span class="av">${esc(dn(x.from)[0]||'?')}</span><div class="sp"><b>${esc(dn(x.from))}</b> wants to join<br><span class="mut">${esc(x.name)}</span><div class="na">${roleSel(x.id)}</div><div class="na"><button class="sm pri" data-ja="${x.id}" data-v="y">Admit</button><button class="sm" data-ja="${x.id}" data-v="n">Deny</button></div></div></div>`).join('')}
+document.addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.jrole;if(id)JR_ROLE[id]=e.target.value});
+$('jr').onclick=e=>{const b=e.target.closest('[data-ja]');if(b)decideJoin(b.dataset.ja,b.dataset.v==='y',JR_ROLE[b.dataset.ja])};
+function loginHint(){const e=$('ljn'),s=sessionStorage.getItem('mc_pend');let t='';try{if(s){const q=new URLSearchParams(s);if(q.get('join'))t='You were invited to join \u201c'+(q.get('n')||'a project')+'\u201d. Pick a name \u2013 the host will be asked to let you in.';else if(q.get('add')||q.get('inv'))t='You were invited to connect. Pick a name to continue.'}}catch(x){}e.hidden=!t;e.textContent=t}
+
+/* ===== number badges, chat retention, unread ===== */
+const fmtN=n=>{n=Math.max(0,Math.floor(Number(n)||0));if(n<1e3)return String(n);const f=(v,u)=>{const t=Math.floor(v*10)/10;return (t%1?t.toFixed(1):String(t))+u};return n<1e4?f(n/1e3,'k'):n<1e6?Math.floor(n/1e3)+'k':n<1e7?f(n/1e6,'M'):Math.floor(n/1e6)+'M'};
+const RET=[['never','Never (don\u2019t save)',0],['1d','1 day',864e5],['3d','3 days',3*864e5],['7d','7 days',7*864e5],['30d','1 month',30*864e5],['all','Forever',-1]];
+const MEM={},CHATLIM={};let UM={},lastChat=null;
+const retV=()=>{const v=rj('mc_ret',{})[me.name];return RET.some(r=>r[0]===v)?v:'all'};
+const retMs=()=>RET.find(r=>r[0]===retV())[2];
+const getMsgs=k=>retMs()===0?(MEM[k]||[]):(rj('mc_msgs',{})[k]||[]);
+function addMsg(k,m){if(retMs()===0){const a=MEM[k]=MEM[k]||[];a.push(m);if(a.length>2000)a.splice(0,a.length-2000);return}
+ const all=rj('mc_msgs',{}),a=all[k]=all[k]||[];a.push(m);if(a.length>2000)a.splice(0,a.length-2000);wj('mc_msgs',all)}
+function pruneMsgs(){if(!me)return;const r=retMs(),all=rj('mc_msgs',{});let ch=false;
+ for(const k of Object.keys(all)){if(!k.split('|').includes(me.name))continue;
+  if(r===0){delete all[k];ch=true}
+  else if(r>0){const c=Date.now()-r,n=all[k].filter(m=>m.t>=c);if(n.length!==all[k].length){ch=true;if(n.length)all[k]=n;else delete all[k]}}}
+ if(ch)wj('mc_msgs',all)}
+const rdG=()=>rj('mc_read',{}),rdK=f=>me.name+'|'+f;
+const markRead=f=>{const a=rdG();a[rdK(f)]=Date.now();wj('mc_read',a)};
+function initRead(){const a=rdG(),k='_i|'+me.name;if(a[k])return;friends(me.name).forEach(f=>{if(a[rdK(f)]===undefined)a[rdK(f)]=Date.now()});a[k]=1;wj('mc_read',a)}
+function unreadMap(){const store=retMs()===0?MEM:rj('mc_msgs',{}),rd=rdG(),o={};
+ const cnt=(id,k)=>{const ms=store[k]||[],lr=rd[rdK(id)]||0;let c=0;for(let i=ms.length-1;i>=0&&ms[i].t>lr;i--)if(ms[i].from!==me.name&&!ms[i].sys)c++;if(c)o[id]=c};
+ friends(me.name).forEach(f=>cnt(f,pkey(me.name,f)));grpL().forEach(g=>cnt('g:'+g.id,'g:'+g.id+'|'+me.name));return o}
+function prep(){if(!me)return;if(chatWith&&!okChat())chatWith=null;
+ UM=unreadMap();if(tab==='ms'&&chatWith&&UM[chatWith]&&!document.hidden){markRead(chatWith);delete UM[chatWith]}
+ let tot=0;for(const k in UM)tot+=UM[k];const e=$('bms');e.hidden=!tot;e.textContent=fmtN(tot);
+ const nn=notes(me.name).filter(x=>!x.read).length,all=tot+nn;document.title=(all?'('+fmtN(all)+') ':'')+'MiniCAD \u2013 Projects'}
+setInterval(()=>{if(me&&!document.hidden)pruneMsgs()},3e5);
+
+/* ===== groups + "All" broadcast ===== */
+const grpL=()=>me?(rj('mc_groups',{})[me.name]||[]):[],setGrp=l=>{const a=rj('mc_groups',{});a[me.name]=l;wj('mc_groups',a)};
+const newGid=()=>'g'+Date.now().toString(36)+rid().slice(0,4);
+const cleanMem=a=>Array.isArray(a)?[...new Set(a.filter(x=>typeof x==='string'&&/^[\w.~-]{2,40}$/.test(x)))].slice(0,64):[];
+const ckey=t=>t==='@all'?'@all|'+me.name:String(t).startsWith('g:')?t+'|'+me.name:pkey(me.name,t);
+const okChat=()=>chatWith==='@all'||friends(me.name).includes(chatWith)||grpL().some(g=>'g:'+g.id===chatWith);
+const grpOf=t=>String(t).startsWith('g:')?grpL().find(g=>'g:'+g.id===t):null;
+function syncGroup(g,extra){[...g.members.filter(x=>x!==me.name),...(extra||[])].forEach(u=>enq(u,'gsync',{gid:g.id,name:g.name,owner:g.owner,members:g.members}))}
+function sysMsg(t,text){addMsg(ckey(t),{from:'',sys:1,text,t:Date.now()})}
+function openChat(t){chatWith=t;tab='ms';lastChat=null;RN[t]=undefined;PA='r';document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='ms'));render()}
+function dropGroupData(id){const k='g:'+id+'|'+me.name,a=rj('mc_msgs',{});if(a[k]){delete a[k];wj('mc_msgs',a)}delete MEM[k]}
+function groupModal(){const f=friends(me.name),m=document.createElement('div');m.className='modal';
+ m.innerHTML=`<div class="card"><h3>New group</h3><div class="mut">Only the people you pick will see this group\u2019s messages.</div><label class="l">Group name</label><input id="gn" maxlength="30" placeholder="e.g. Gear team"><label class="l">Add friends</label><div>${f.map(n=>`<label class="row" style="cursor:pointer"><input type="checkbox" data-u="${esc(n)}"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}</span></label>`).join('')||'<div class="empty">Add friends first.</div>'}</div><div class="err" id="gerr"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="gc">Cancel</button><button class="pri" id="gk">Create group</button></div></div>`;
+ document.body.appendChild(m);$('gn').focus();$('gc').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+ $('gk').onclick=()=>{const name=$('gn').value.trim(),sel=[...m.querySelectorAll('[data-u]:checked')].map(c=>c.dataset.u);
+  if(!name)return $('gerr').textContent='Give the group a name';if(!sel.length)return $('gerr').textContent='Pick at least one friend';
+  const g={id:newGid(),name:name.slice(0,30),owner:me.name,members:[me.name,...sel],t:Date.now()};setGrp([...grpL(),g]);syncGroup(g);m.remove();openChat('g:'+g.id)}}
+function groupInfo(){const g=grpOf(chatWith);if(!g)return;const own=g.owner===me.name,cand=friends(me.name).filter(n=>!g.members.includes(n)),m=document.createElement('div');m.className='modal';
+ m.innerHTML=`<div class="card"><h3>${esc(g.name)}</h3><div class="mut">${fmtN(g.members.length)} member${g.members.length>1?'s':''}</div><label class="l">Members</label>${g.members.map(u=>`<div class="row"><span class="av s">${esc(dn(u)[0]||'?')}</span><span class="sp">${esc(dn(u))}${u===me.name?' (you)':''}</span>${u===g.owner?'<span class="tag ok">owner</span>':''}${own&&u!==me.name?`<button class="sm bad" data-rmm="${esc(u)}">Remove</button>`:''}</div>`).join('')}${own&&cand.length?`<label class="l">Add people</label>${cand.map(n=>`<label class="row" style="cursor:pointer"><input type="checkbox" data-u="${esc(n)}"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}</span></label>`).join('')}<button class="sm pri" id="gadd" style="margin-top:8px">Add selected</button>`:''}<div style="display:flex;gap:8px;justify-content:space-between;margin-top:16px"><button class="bad" id="glv">Leave group</button><button id="gx">Close</button></div></div>`;
+ document.body.appendChild(m);const t=chatWith,again=()=>{m.remove();render();groupInfo()};
+ m.onclick=e=>{if(e.target===m)return m.remove();const b=e.target.closest('button');if(!b)return;
+  if(b.id==='gx')return m.remove();
+  if(b.dataset.rmm){const u=b.dataset.rmm;g.members=g.members.filter(x=>x!==u);const gs=grpL();gs.splice(gs.findIndex(x=>x.id===g.id),1,g);setGrp(gs);syncGroup(g,[u]);sysMsg(t,dn(u)+' was removed');again()}
+  else if(b.id==='gadd'){const add=[...m.querySelectorAll('[data-u]:checked')].map(c=>c.dataset.u);if(!add.length)return;g.members.push(...add);const gs=grpL();gs.splice(gs.findIndex(x=>x.id===g.id),1,g);setGrp(gs);syncGroup(g);sysMsg(t,add.map(dn).join(', ')+' added');again()}
+  else if(b.id==='glv'){if(!confirm('Leave \u201c'+g.name+'\u201d? Its messages on this device will be deleted.'))return;
+   const others=g.members.filter(x=>x!==me.name);
+   if(own&&others.length){const g2=Object.assign({},g,{owner:others[0],members:others});others.forEach(u=>enq(u,'gsync',{gid:g.id,name:g.name,owner:g2.owner,members:others}))}
+   else others.forEach(u=>enq(u,'gleave',{gid:g.id}));
+   setGrp(grpL().filter(x=>x.id!==g.id));dropGroupData(g.id);chatWith=null;m.remove();render()}}}
+
+/* ---- messages UI helpers ---- */
+let PA='';const RN={};
+const hm=t=>new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const dayL=t=>{const d=new Date(t),n=new Date(),y=new Date(n-864e5),sm=(a,b)=>a.toDateString()===b.toDateString();return sm(d,n)?'Today':sm(d,y)?'Yesterday':d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
+const shortT=t=>new Date(t).toDateString()===new Date().toDateString()?hm(t):dayL(t);
+const nc=n=>{let h=0;for(const c of String(n))h=(h*31+c.charCodeAt(0))%360;return 'hsl('+h+' 62% 50%)'};
+function renderPane(){renderPane0();const p=$('pane');p.classList.toggle('inchat',tab==='ms'&&!!chatWith);
+ if(PA){p.classList.remove('a-r','a-l','a-f');void p.offsetWidth;p.classList.add('a-'+PA);PA='';clearTimeout(p._ft);p._ft=setTimeout(()=>p.classList.remove('a-r','a-l','a-f'),700);
+  const mt=$('mt');if(mt&&window.matchMedia&&matchMedia('(hover:hover)').matches)mt.focus({preventScroll:true})}}
+
 /* login */
 function login(name){name=name.trim();if(!/^[\w.-]{2,20}$/.test(name)){$('lerr').textContent='Use 2–20 letters, numbers, _ . -';return}
-const us=rj('mc_users',{}),old=us[name],now=Date.now();
+const us=rj('mc_users',{}),key=Object.keys(us).find(k=>k.toLowerCase()===name.toLowerCase())||name,old=us[key],now=Date.now();
 const u=Object.assign({name:name+'~'+rid(),id:'u_'+rid(),peer:'peer-'+rid()+rid(),created:now,logins:0},old||{});
-u.prevLogin=u.last||null;u.last=now;u.logins++;us[name]=u;wj('mc_users',us);
+u.prevLogin=u.last||null;u.last=now;u.logins++;us[key]=u;wj('mc_users',us);
 me=Object.assign({},u,{session:rid(),ua:navigator.userAgent,lang:navigator.language,tz:Intl.DateTimeFormat().resolvedOptions().timeZone,screen:screen.width+'×'+screen.height});
-wj('mc_me',me);boot()}
+wj('mc_me',me);try{sessionStorage.setItem('mc_tab',JSON.stringify(me))}catch(e){}boot()}
 $('lgo').onclick=()=>login($('un').value);$('un').onkeydown=e=>{if(e.key==='Enter')login(e.target.value)};
-$('out').onclick=()=>{localStorage.removeItem('mc_me');me=null;boot()};
+$('out').onclick=()=>{localStorage.removeItem('mc_me');try{sessionStorage.removeItem('mc_tab')}catch(e){}me=null;boot()};
 
 function boot(){document.body.classList.toggle('out',!me);$('login').hidden=!!me;$('app').hidden=!me;
-if(!me){setTimeout(()=>$('un').focus(),50);show();return}
-$('hname').textContent=dn(me.name);$('gr').innerHTML='Hi, '+esc(dn(me.name))+'<small>Pick up where you left off or start something new.</small>';$('hav').textContent=dn(me.name)[0];render();show();linkIn()}
+if(!me){netStop();loginHint();setTimeout(()=>$('un').focus(),50);show();return}
+$('hname').textContent=dn(me.name);$('gr').innerHTML='Hi, '+esc(dn(me.name))+'<small>Pick up where you left off or start something new.</small>';$('hav').textContent=dn(me.name)[0];netStart();initRead();pruneMsgs();render();show();linkIn()}
 
 /* render */
-function render(){if(!me)return;renderProjects();renderNotes();renderPane()}
+function render(){if(!me)return;prep();renderProjects();renderNotes();renderPane()}
 function card(p,mine){const r=mine?'Owner':(p.members.find(m=>m.user===me.name)||{}).role,acc=p.members.filter(m=>m.status==='accepted'),ppl=[p.owner,...acc.map(m=>m.user)],pend=p.members.filter(m=>m.status==='pending').length;
 return `<article class="proj"><div class="th" data-open="${p.id}" style="${p.thumb?`background-image:url(${p.thumb})`:''}">${p.thumb?'':'<svg class="ph"><use href="#mc"/></svg>'}<span class="go">Open designer →</span></div>
 <div class="pi"><div class="pt"><b>${esc(p.name)}</b>${mine?`<span class="ib"><button data-ren="${p.id}" title="Rename"><svg class="i"><use href="#i-edit"/></svg></button><button class="bad" data-del="${p.id}" title="Delete"><svg class="i"><use href="#i-trash"/></svg></button></span>`:''}</div><small>${mine?'':'by '+esc(dn(p.owner)||'a friend')+' · '}${p.updated?'Saved '+fmt(p.updated):'Created '+fmt(p.created)}</small>
-<div class="pa"><span class="stack">${ppl.slice(0,4).map(n=>`<span class="av s" title="${esc(dn(n))}">${esc(dn(n)[0]||'?')}</span>`).join('')}</span><span class="tag">${esc(r)}</span><span class="sp"></span><button class="inv" data-cp="${p.id}" title="Copy a link to this project">🔗 Copy link</button>${mine?`<button class="inv" data-inv="${p.id}" title="Add friends to this project"><svg class="i"><use href="#i-uadd"/></svg>Invite${pend?` <em>${pend}</em>`:''}</button>`:`<button class="sm" data-open="${p.id}">Open</button>`}</div></div></article>`}
+<div class="pa"><span class="stack">${ppl.slice(0,4).map(n=>`<span class="av s" title="${esc(dn(n))}">${esc(dn(n)[0]||'?')}</span>`).join('')}</span><span class="tag">${esc(r)}</span><span class="sp"></span><button class="inv" data-cp="${p.id}" title="Copy a link to this project">🔗 Copy link</button>${mine?`<button class="inv" data-inv="${p.id}" title="Add friends to this project"><svg class="i"><use href="#i-uadd"/></svg>Invite${pend?` <em>${fmtN(pend)}</em>`:''}</button>`:`<button class="sm" data-open="${p.id}">Open</button>`}</div></div></article>`}
 function renderProjects(){const ps=rj('mc_projects',[]),mine=ps.filter(p=>p.owner===me.name),sh=ps.filter(p=>p.owner!==me.name&&p.members.some(m=>m.user===me.name&&m.status==='accepted'));
 $('mine').innerHTML='<div class="newt" data-new="1"><i><svg class="i"><use href="#i-plus"/></svg></i>Create project<small>Opens the designer instantly</small></div>'+mine.map(p=>card(p,1)).join('');
 $('shared').innerHTML=sh.map(p=>card(p,0)).join('')||'<div class="empty">Projects friends add you to will show here.</div>'}
@@ -186,10 +528,11 @@ else if(o)go(DESIGN+'?p='+o.dataset.open)});
 
 /* notifications */
 const ago=t=>{const x=(Date.now()-t)/1e3;return x<60?'just now':x<3600?Math.floor(x/60)+'m ago':x<86400?Math.floor(x/3600)+'h ago':fmt(t)};
-function renderNotes(){const l=notes(me.name),n=l.filter(x=>!x.read).length;$('dot').hidden=!n;$('dot').textContent=n>9?'9+':n;$('bell').classList.toggle('ring',!!n);
+function renderNotes(){const l=notes(me.name);renderJR(l);const n=l.filter(x=>!x.read).length;$('dot').hidden=!n;$('dot').textContent=fmtN(n);$('bell').classList.toggle('ring',!!n);
 $('notes').innerHTML=`<div class="nh"><b>Notifications</b>${n?`<span class="tag ok">${n} new</span>`:''}<span class="sp"></span>${l.length?'<button class="sm" id="nclr">Clear all</button>':''}</div><div class="nl">`+(l.map(x=>{let ic='info',txt,act='';
 if(x.type==='friend_request'){ic='uadd';txt=`<b>${esc(dn(x.from))}</b> sent you a friend request`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Accept</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
 else if(x.type==='project_invite'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> invited you to <b>${esc(x.name)}</b> as ${esc(x.role)}`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Join</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
+else if(x.type==='join_request'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> is asking to join <b>${esc(x.name)}</b>`;if(!x.done)act=roleSel(x.id)+`<button class="sm pri" data-ja="${x.id}" data-v="y">Admit</button><button class="sm" data-ja="${x.id}" data-v="n">Deny</button>`}
 else txt=esc(x.text);
 return `<div class="ni${x.read?'':' un'}"><span class="nic ${ic}"><svg class="i"><use href="#i-${ic==='uadd'?'uadd':ic}"/></svg></span><div class="sp">${txt}<small class="mut">${ago(x.t)}${x.done?' · '+(x.done==='y'?'accepted':'declined'):''}</small>${act?`<div class="na">${act}</div>`:''}</div></div>`}).join('')||'<div class="nz"><svg class="i"><use href="#i-bell"/></svg><b>You’re all caught up</b><span class="mut">Friend requests and project invites show up here.</span></div>')+'</div>'}
 const closeN=()=>{if($('notes').hidden)return;$('notes').hidden=true;setNotes(me.name,notes(me.name).map(x=>(x.read=1,x)));renderNotes()};
@@ -197,39 +540,74 @@ $('bell').onclick=e=>{e.stopPropagation();$('notes').hidden?$('notes').hidden=fa
 document.addEventListener('click',e=>{if(me&&!$('notes').hidden&&!e.target.closest('#notes,#bell'))closeN()});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&me)closeN()});
 $('notes').onclick=e=>{const b=e.target;if(b.id==='nclr'){setNotes(me.name,[]);return render()}
+if(b.dataset.ja){decideJoin(b.dataset.ja,b.dataset.v==='y',JR_ROLE[b.dataset.ja]);return}
 const id=b.dataset.na;if(!id)return;const l=notes(me.name),n=l.find(x=>x.id===id),yes=b.dataset.v==='y';n.done=b.dataset.v;n.read=1;setNotes(me.name,l);
-if(n.type==='friend_request'&&yes){setFr(me.name,[...friends(me.name),n.from]);setFr(n.from,[...friends(n.from),me.name]);pushNote(n.from,{type:'info',text:dn(me.name)+' accepted your friend request'})}
-if(n.type==='project_invite'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===n.pid),m=p&&p.members.find(q=>q.user===me.name);if(m){m.status=yes?'accepted':'declined';wj('mc_projects',ps);pushNote(p.owner,{type:'info',text:`${dn(me.name)} ${yes?'joined':'declined'} "${p.name}"`})}}
+if(n.type==='friend_request'){if(yes){setFr(me.name,[...friends(me.name),n.from]);if(n.code)setInv(invL().map(x=>x.code===n.code?Object.assign(x,{n:(x.n||0)+1}):x))}enq(n.from,yes?'fr_acc':'fr_dec',{})}
+if(n.type==='project_invite'){const ps=rj('mc_projects',[]);let p=ps.find(q=>q.id===n.pid);
+if(yes){if(!p){p={id:n.pid,name:n.name,owner:n.from,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}
+let m=p.members.find(q=>q.user===me.name);if(!m){m={user:me.name,role:n.role};p.members.push(m)}m.role=n.role;m.status='accepted';wj('mc_projects',ps)}
+enq(n.from,'presp',{pid:n.pid,yes:yes?1:0})}
 ping();render()};
 
 /* side pane */
-document.querySelector('.tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;tab=t;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));renderPane()};
-function renderPane(){const p=$('pane'),f=friends(me.name);
-if(tab==='fr'){p.innerHTML=`<label class="l">Your unique link</label><div class="add"><input id="ml" readonly value="${esc(myLink())}" onfocus="this.select()"><button class="pri" id="cpl">Copy</button></div><label class="l">Connect with a friend</label><div class="add"><input id="fa" placeholder="Paste a friend's link"><button class="pri" id="fb">Add</button></div><div class="err" id="ferr"></div>`+
-(f.map(n=>`<div class="row"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}</span><button class="sm" data-chat="${esc(n)}">Message</button><button class="sm bad" data-rm="${esc(n)}">✕</button></div>`).join('')||'<div class="empty">No friends yet. Copy your link and send it, or paste a link from a friend above.</div>');
+document.querySelector('.tabs').onclick=e=>{const tb=e.target.closest('[data-t]'),t=tb&&tb.dataset.t;if(!t)return;tab=t;PA='f';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render()};
+function renderPane0(){const p=$('pane'),f=friends(me.name);
+if(tab==='fr'){p.innerHTML=`<button class="pri" id="gl" style="width:100%;margin-bottom:6px">\uFF0B Generate new link</button><div class="mut" style="font-size:12px;margin-bottom:6px">Makes a fresh invite link and copies it. Send it to a friend \u2013 when they open it, you get a request and choose whether to accept.</div><div class="mut" id="nst" style="font-size:12px;margin:2px 0 4px"></div>`+invRows()+`<label class="l">Got a friend's link?</label><div class="add"><input id="fa" placeholder="Paste the invite link"><button class="pri" id="fb">Add</button></div><div class="err" id="ferr"></div>`+pendRows()+`<div class="sec">Your friends (${fmtN(f.length)})</div>`+
+(f.map(n=>`<div class="row"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}<small class="mut" data-pst="${esc(n)}" style="display:block">${presLabel(n)}</small></span><button class="sm" data-chat="${esc(n)}">Message${UM[n]?`<span class="bdg">${fmtN(UM[n])}</span>`:''}</button><button class="sm bad" data-rm="${esc(n)}" title="Remove friend">\u2715</button></div>`).join('')||'<div class="empty">No friends yet. Tap Generate new link and send it, or paste a link from a friend above.</div>');netUI();
 }
-else if(tab==='ms'){const top=f.length?`<select id="cw" style="margin-bottom:8px;width:100%">${f.map(n=>`<option value="${esc(n)}" ${n===chatWith?'selected':''}>${esc(dn(n))}</option>`).join('')}</select>`:'';
-if(!chatWith||!f.includes(chatWith))chatWith=f[0]||null;
-if(!chatWith){p.innerHTML='<div class="empty">Add a friend first to start chatting.</div>';return}
-const ms=rj('mc_msgs',{})[pkey(me.name,chatWith)]||[];
-p.innerHTML=`<div class="chat">${top}<div class="msgs" id="msgs">${ms.map(m=>`<div class="msg ${m.from===me.name?'me':''}">${esc(m.text)}</div>`).join('')||'<div class="empty">Say hi 👋</div>'}</div><div class="add" style="margin:8px 0 0"><input id="mt" placeholder="Message ${esc(dn(chatWith))}"><button class="pri" id="mb">Send</button></div></div>`;
-const m=$('msgs');m.scrollTop=m.scrollHeight}
-else{const rows=[['Display name',dn(me.name)],['Your link',myLink()],['User ID',me.id],['WebRTC peer ID',me.peer],['Session ID',me.session],['Account created',fmt(me.created)],['This login',fmt(me.last)],['Previous login',me.prevLogin?fmt(me.prevLogin):'First time'],['Total logins',me.logins],['Time zone',me.tz],['Language',me.lang],['Screen',me.screen],['Device',me.ua]];
+else if(tab==='ms'){const gs=grpL(),store=retMs()===0?MEM:rj('mc_msgs',{});
+const rs=`<label class="l" style="margin:18px 0 4px">Keep chats for</label><select id="ret" style="width:100%">${RET.map(r=>`<option value="${r[0]}"${retV()===r[0]?' selected':''}>${r[1]}</option>`).join('')}</select>`;
+const GRN='background:linear-gradient(135deg,#16a34a,#0d9488)',ORG='background:linear-gradient(135deg,#d9822b,#e8a94a)';
+if(!chatWith){lastChat=null;let ix=0;
+ const last=k=>{const a=store[k];return a&&a.length?a[a.length-1]:null};
+ const pv=(m,grp)=>m?(m.tag==='all'?'<span class="tg" style="margin-right:6px">All</span>':'')+esc(((m.sys?'':m.from===me.name?'You: ':grp?dn(m.from)+': ':'')+m.text).slice(0,60)):'<i>No messages yet</i>';
+ const row=(id,av,title,sub,m,u,st,cls)=>`<div class="row chat-r${u?' un':''}${cls?' '+cls:''}" data-oc="${esc(id)}" style="animation-delay:${Math.min(ix++,10)*35}ms"><span class="av" style="${st||''}">${av}</span><span class="sp"><span class="ctop"><b>${esc(title)}</b>${m?`<small class="ct">${shortT(m.t)}</small>`:''}</span><small class="cs">${sub}</small></span>${u?`<span class="bdg">${fmtN(u)}</span>`:''}</div>`;
+ const tm=x=>(x.m&&x.m.t)||0;
+ const fr=f.map(n=>({n,m:last(pkey(me.name,n))})).sort((x,y)=>tm(y)-tm(x));
+ const gr=gs.map(g=>({g,m:last('g:'+g.id+'|'+me.name)})).sort((x,y)=>tm(y)-tm(x));
+ p.innerHTML=row('@all','All','All friends',(last('@all|'+me.name)?pv(last('@all|'+me.name)):(f.length?'Send one message to all '+fmtN(f.length)+' friend'+(f.length>1?'s':''):'Add friends first')),last('@all|'+me.name),0,GRN,'pin')+
+ `<button class="ngb" id="ng"><i>\uFF0B</i><span>New group<small>Pick special people from your friends</small></span></button>`+
+ (gr.length?'<div class="sec">Groups</div>'+gr.map(x=>row('g:'+x.g.id,esc((x.g.name[0]||'G').toUpperCase()),x.g.name,pv(x.m,1),x.m,UM['g:'+x.g.id],ORG)).join(''):'')+
+ (fr.length?'<div class="sec">Friends</div>'+fr.map(x=>row(x.n,esc(dn(x.n)[0]||'?'),dn(x.n),pv(x.m),x.m,UM[x.n])).join(''):'<div class="empty" style="margin-top:12px">Add a friend to start chatting.</div>')+rs;return}
+const isAll=chatWith==='@all',g=grpOf(chatWith),isF=!isAll&&!g,key=ckey(chatWith);
+const title=isAll?'All friends':g?g.name:dn(chatWith),sub=isAll?(f.length?'Your message goes to all '+fmtN(f.length)+' friend'+(f.length>1?'s':''):'Add friends first'):g?fmtN(g.members.length)+' members':presLabel(chatWith);
+const avT=isAll?'All':esc((title[0]||'?').toUpperCase()),avS=isAll?GRN:g?ORG:'';
+const all=getMsgs(key),lim=CHATLIM[chatWith]||80,ms=all.slice(-lim),off=all.length-ms.length,old=$('msgs'),near=!old||lastChat!==chatWith||old.scrollHeight-old.scrollTop-old.clientHeight<80;lastChat=chatWith;
+const pn=RN[chatWith];RN[chatWith]=all.length;let pd='';
+const body=ms.map((m,i)=>{const dl=dayL(m.t);let h='';if(dl!==pd){pd=dl;h=`<div class="dsep"><span>${dl}</span></div>`}
+ if(m.sys)return h+`<div class="sysm">${esc(m.text)}</div>`;const mine=m.from===me.name;
+ return h+`<div class="msg${mine?' me':''}${pn!==undefined&&off+i>=pn?' pop':''}">${g&&!mine?`<small class="snd" style="color:${nc(m.from)}">${esc(dn(m.from))}</small>`:''}<span>${esc(m.text)}</span><span class="mm">${(isAll||m.tag==='all')?'<small class="tg">All</small>':'<span></span>'}<small class="tm">${hm(m.t)}</small></span></div>`}).join('');
+p.innerHTML=`<div class="chat"><div class="chh"><button class="sm" data-back="1" title="Back">\u2190</button><span class="av" style="${avS}">${avT}</span><span class="sp"><b>${esc(title)}</b><small class="mut" ${isF?`data-pst="${esc(chatWith)}"`:''} style="display:block">${sub}</small></span>${g?'<button class="sm" data-ginfo="1">Info</button>':''}</div><div class="msgs" id="msgs">${all.length>lim?`<button class="sm" data-more="1" style="align-self:center;flex:none">Show earlier (${fmtN(all.length-lim)})</button>`:''}${body||`<div class="empty" style="margin:auto">${isAll?'Say something to everyone \uD83D\uDCE2':'Say hi \uD83D\uDC4B'}</div>`}</div><div class="cin"><input id="mt" autocomplete="off" placeholder="${isAll?'Message all friends':g?'Message '+esc(g.name):'Message '+esc(dn(chatWith))}"><button class="pri" id="mb" title="Send"><svg class="i" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg></button></div></div>`;
+const m=$('msgs');if(near)m.scrollTop=m.scrollHeight}
+else{const rows=[['Display name',dn(me.name)],['User ID',me.id],['WebRTC peer ID',pid(me.name)],['Session ID',me.session],['Account created',fmt(me.created)],['This login',fmt(me.last)],['Previous login',me.prevLogin?fmt(me.prevLogin):'First time'],['Total logins',me.logins],['Time zone',me.tz],['Language',me.lang],['Screen',me.screen],['Device',me.ua]];
 p.innerHTML=`<dl>${rows.map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('')}</dl><p class="mut" style="font-size:12px">Saved on this device. The design page reads this same session (<code>window.MC</code>) so it can use the peer ID and project room for WebRTC.</p>`}}
-$('pane').onclick=e=>{const b=e.target;
+$('pane').onclick=e=>{const oc=e.target.closest('[data-oc]');if(oc&&!e.target.closest('button'))return openChat(oc.dataset.oc);const b=e.target.closest('button')||e.target;
+if(b.id==='ng')return groupModal();if(b.dataset.back){chatWith=null;lastChat=null;PA='l';return render()}if(b.dataset.ginfo)return groupInfo();
 if(b.id==='fb'){const v=$('fa').value.trim();if(!v)return $('ferr').textContent='Paste a link first';$('ferr').textContent='';
-let qs;try{qs=v.includes('?')?v.slice(v.indexOf('?')):'?add='+encodeURIComponent(v)}catch(x){qs=''}
+let qs;try{const m=/[?#&](add|join|inv)=/.exec(v);qs=m?'?'+v.slice(m.index+1):'?add='+encodeURIComponent(v)}catch(x){qs=''}
 sessionStorage.setItem('mc_pend',qs);$('fa').value='';linkIn()}
-if(b.id==='cpl')copy($('ml').value);
-if(b.dataset.chat){chatWith=b.dataset.chat;tab='ms';document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='ms'));renderPane()}
-if(b.dataset.rm&&confirm('Remove '+b.dataset.rm+'?')){const n=b.dataset.rm;setFr(me.name,friends(me.name).filter(x=>x!==n));setFr(n,friends(n).filter(x=>x!==me.name));ping();renderPane()}
+if(b.id==='gl'){const c=genCode();setInv([...invL(),{code:c,t:Date.now()}]);copy(invLink(c));toast('New invite link copied');renderPane()}
+if(b.dataset.cpi)copy(invLink(b.dataset.cpi));
+if(b.dataset.shi)navigator.share({title:'Join me on MiniCAD',text:'Open this link to become my friend on MiniCAD',url:invLink(b.dataset.shi)}).catch(()=>{});
+if(b.dataset.rvi){setInv(invL().filter(x=>x.code!==b.dataset.rvi));renderPane()}
+if(b.dataset.chat)openChat(b.dataset.chat);
+if(b.dataset.more){CHATLIM[chatWith]=(CHATLIM[chatWith]||80)+200;renderPane()}
+if(b.dataset.rm&&confirm('Remove '+dn(b.dataset.rm)+'?')){const n=b.dataset.rm;setFr(me.name,friends(me.name).filter(x=>x!==n));enq(n,'fr_rm',{});ping();renderPane()}
+if(b.dataset.cancel){cancelReq(b.dataset.cancel);renderPane()}
 if(b.id==='mb')send()};
 $('pane').onkeydown=e=>{if(e.key==='Enter'&&e.target.id==='mt')send();if(e.key==='Enter'&&e.target.id==='fa')$('fb').click()};
-$('pane').onchange=e=>{if(e.target.id==='cw'){chatWith=e.target.value;renderPane()}};
-function send(){const t=$('mt').value.trim();if(!t||!chatWith)return;const a=rj('mc_msgs',{}),k=pkey(me.name,chatWith);(a[k]=a[k]||[]).push({from:me.name,text:t,t:Date.now()});wj('mc_msgs',a);ping();renderPane();$('mt').focus()}
+$('pane').onchange=e=>{if(e.target.id==='cw'){chatWith=e.target.value;render()}
+if(e.target.id==='ret'){const v=e.target.value,r=RET.find(x=>x[0]===v),cur=retMs(),shrink=r[2]!==-1&&cur!==0&&(cur===-1||r[2]<cur);
+ if(shrink&&!confirm(r[2]===0?'Chats will stop being saved and the ones on this device will be deleted now. Continue?':'Messages older than '+r[1]+' will be deleted from this device. Continue?')){renderPane();return}
+ const a=rj('mc_ret',{});a[me.name]=v;wj('mc_ret',a);pruneMsgs();lastChat=null;render()}};
+function send(){const t=$('mt').value.trim();if(!t||!chatWith)return;const now=Date.now();
+ if(chatWith==='@all'){const f=friends(me.name);if(!f.length)return;addMsg(ckey('@all'),{from:me.name,text:t,t:now,tag:'all'});f.forEach(u=>enq(u,'chat',{text:t,tag:'all'}))}
+ else if(chatWith.startsWith('g:')){const g=grpOf(chatWith);if(!g)return;addMsg(ckey(chatWith),{from:me.name,text:t,t:now});g.members.filter(x=>x!==me.name).forEach(u=>enq(u,'gchat',{gid:g.id,text:t}))}
+ else{addMsg(pkey(me.name,chatWith),{from:me.name,text:t,t:now});enq(chatWith,'chat',{text:t})}
+ ping();lastChat=null;render();$('mt').focus()}
 
 /* projects: quick create, create with friends, invite to existing */
-const mkProj=(name,mem,ah)=>{const ps=rj('mc_projects',[]),p={id:'p'+Date.now().toString(36)+rid().slice(0,3),name,owner:me.name,members:mem||[],allowHostLeave:!!ah,created:Date.now()};ps.push(p);wj('mc_projects',ps);(mem||[]).forEach(x=>pushNote(x.user,{type:'project_invite',from:me.name,pid:p.id,name,role:x.role}));return p};
+const mkProj=(name,mem,ah)=>{const ps=rj('mc_projects',[]),p={id:'p'+Date.now().toString(36)+rid().slice(0,3),name,owner:me.name,members:mem||[],allowHostLeave:!!ah,created:Date.now()};ps.push(p);wj('mc_projects',ps);(mem||[]).forEach(x=>enq(x.user,'pinv',{pid:p.id,name,role:x.role}));return p};
 const quick=()=>{const n=rj('mc_projects',[]).filter(p=>p.owner===me.name).length+1;go(DESIGN+'?p='+mkProj('Untitled project '+n).id)};$('newp').onclick=quick;
 $('newf').onclick=()=>picker(null);
 function picker(pid){const ps=rj('mc_projects',[]),pr=pid&&ps.find(p=>p.id===pid),taken=pr?pr.members.map(m=>m.user):[],f=friends(me.name).filter(n=>!taken.includes(n)),m=document.createElement('div');m.className='modal';
@@ -241,11 +619,14 @@ ${pr&&pr.members.length?`<label class="l">Already invited</label>${pr.members.ma
 <div class="err" id="perr"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="pc">Cancel</button><button class="pri" id="pk">${pr?'Add to project':'Create & open'}</button></div></div>`;
 document.body.appendChild(m);if($('pn'))$('pn').focus();$('pc').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
 $('pk').onclick=()=>{const mem=[...m.querySelectorAll('[data-u]:checked')].map(c=>({user:c.dataset.u,role:m.querySelector(`[data-r="${c.dataset.u}"]`).value,status:'pending'})),ah=$('ah').checked;
-if(pr){const ps2=rj('mc_projects',[]),p=ps2.find(q=>q.id===pid);p.members.push(...mem);p.allowHostLeave=ah;wj('mc_projects',ps2);mem.forEach(x=>pushNote(x.user,{type:'project_invite',from:me.name,pid:p.id,name:p.name,role:x.role}));m.remove();render();return}
+if(pr){const ps2=rj('mc_projects',[]),p=ps2.find(q=>q.id===pid);p.members.push(...mem);p.allowHostLeave=ah;wj('mc_projects',ps2);mem.forEach(x=>enq(x.user,'pinv',{pid:p.id,name:p.name,role:x.role}));m.remove();render();return}
 const name=$('pn').value.trim();if(!name)return $('perr').textContent='Give the project a name';m.remove();go(DESIGN+'?p='+mkProj(name,mem,ah).id)}}
 
 /* live updates across tabs */
-addEventListener('storage',()=>render());if(bc)bc.onmessage=()=>{if(!document.activeElement||!/INPUT|SELECT/.test(document.activeElement.tagName))render()};
-addEventListener('pageshow',e=>{if(e.persisted){me=rj('mc_me',null);boot()}});
+addEventListener('storage',e=>{softRender();if(e.key==='mc_out')flush()});if(bc)bc.onmessage=()=>softRender();
+addEventListener('pageshow',e=>{if(e.persisted){me=getMe();boot()}});
+addEventListener('pagehide',()=>{if(me)netStop()});
+/* only touch the DOM when the markup really changed (keeps typing, scroll and focus; far fewer repaints) */
+(()=>{const d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');['mine','shared','pane','notes','jr'].forEach(id=>{const e=$(id);Object.defineProperty(e,'innerHTML',{configurable:true,get(){return d.get.call(e)},set(v){if(e._h===v)return;e._h=v;d.set.call(e,v)}})})})();
 boot();
 </script></body></html>

@@ -182,10 +182,12 @@ const base=()=>/^https?:/.test(location.href)?location.origin+location.pathname.
 const myLink=()=>base()+'#add='+encodeURIComponent(me.name);
 const projLink=p=>base()+'#join='+encodeURIComponent(p.id)+'&o='+encodeURIComponent(p.owner)+'&n='+encodeURIComponent(p.name);
 function linkIn(){const s=sessionStorage.getItem('mc_pend');if(!s||!me)return;sessionStorage.removeItem('mc_pend');try{history.replaceState(null,'',location.pathname)}catch(e){}
-const q=new URLSearchParams(s),a=q.get('add'),j=q.get('join'),iv=q.get('inv'),iu=q.get('u');
+const q=new URLSearchParams(s),a=q.get('add'),j=q.get('join'),iv=q.get('inv'),iu=q.get('u'),ts=q.get('ts')==='1';
 if(iv){if(!/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(iv)||!/^[\w.~-]{2,40}$/.test(iu||''))return toast('That link is not valid');
 if(iu===me.name)return toast('That is your own link');
-tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));const r=addFriend(iu,iv);render();return toast(r)}
+/* troubleshoot link: the code word is read automatically; turn the relay on just long enough to connect, then it drops back to peer-to-peer */
+if(ts)relayOn(true);
+tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));const r=addFriend(iu,iv);render();if(ts)relayDoneMaybe();return toast(ts?'Troubleshoot code read – connecting via relay…':r)}
 if(a){if(!/^[\w.~-]{2,40}$/.test(a))return toast('That link is not valid');
 if(a===me.name)return toast('That is your own link');
 tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));const r=addFriend(a);render();return toast(r)}
@@ -215,6 +217,25 @@ const pkey=(a,b)=>[a,b].sort().join('|');
      other person acknowledges it. Online / offline status comes from a small ping between friends.
    This page only touches mc_* storage keys and 'mcad-' peer ids; Vibeo Meet uses its own vibeo- / vibeo_ names. */
 const CFG={PUBLIC_URL:'https://arulv123.github.io/Mini-cad-main-ui/' /* main link of this page */,SIGNALING:{},ICE:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],TURN:[]},TTL=30*864e5,SLOTS=8;
+/* ===== Troubleshoot relay =====
+   By default TURN is EMPTY: connections are pure peer-to-peer, like Vibeo Meet – fast and free, and work
+   whenever both friends are online at the same time. The relay below is only switched ON when someone presses
+   "Troubleshoot" (for a friend stuck behind a strict/parental network). We use it ONLY to get the two people
+   introduced, then turn it back OFF so ongoing traffic stays peer-to-peer and the free quota is barely touched.
+   For your own private quota, make a free TURN at https://dashboard.metered.ca and replace these. */
+const RELAY=[
+ {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
+ {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
+ {urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'},
+ {urls:'turns:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'}
+];
+/* relayOn(): switch the relay on for this session and reconnect so the new ICE servers take effect.
+   relayOff(): back to pure peer-to-peer. 'auto' flag means we turned it on just to connect and will drop it after. */
+let RELAY_AUTO=false;
+function relayOn(auto){if(CFG.TURN.length){if(auto)RELAY_AUTO=true;return}CFG.TURN=RELAY.slice();if(auto)RELAY_AUTO=true;try{toast('Troubleshoot mode: using a relay to connect…')}catch(e){}if(NET.name){NET.open=false;claim(1)}try{renderPane&&renderPane()}catch(e){}}
+function relayOff(){if(!CFG.TURN.length){RELAY_AUTO=false;return}CFG.TURN=[];RELAY_AUTO=false;try{renderPane&&renderPane()}catch(e){}}
+/* after a relay-assisted connect finishes, drop back to peer-to-peer so we don't spend quota on ongoing traffic */
+function relayDoneMaybe(){if(RELAY_AUTO&&CFG.TURN.length){setTimeout(()=>{if(RELAY_AUTO){relayOff();try{toast('Connected – back to direct peer-to-peer')}catch(e){}}},6000)}}
 const pid=n=>'mcad-'+[...String(n)].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join('');
 const slotId=(n,g)=>pid(n)+(g>1?'-'+g:'');
 const okPeer=(peer,n)=>{const p=pid(n);return peer===p||new RegExp('^'+p+'-\\d{1,2}$').test(String(peer))};
@@ -235,6 +256,8 @@ function cancelReq(to){setSent(sentL().filter(x=>x.to!==to));wj('mc_out',outL().
 const genCode=()=>{const c='abcdefghijkmnpqrstuvwxyz',r=n=>{let s='';const a=new Uint8Array(n);crypto.getRandomValues(a);a.forEach(x=>s+=c[x%c.length]);return s};return r(3)+'-'+r(4)+'-'+r(3)};
 const invL=()=>me?(rj('mc_inv',{})[me.name]||[]):[],setInv=l=>{const a=rj('mc_inv',{});a[me.name]=l;wj('mc_inv',a)};
 const invLink=c=>base()+'#inv='+c+'&u='+encodeURIComponent(me.name);
+/* troubleshoot link = a normal invite link + the ts=1 marker, so the friend's app knows to connect via the relay */
+const tsLink=c=>base()+'#inv='+c+'&u='+encodeURIComponent(me.name)+'&ts=1';
 const invRows=()=>{const l=invL();return l.length?'<label class="l">Your invite links <small class="mut">(never expire)</small></label>'+l.map(x=>`<div class="row"><span class="sp"><code style="word-break:break-all;font-size:11px">${esc(invLink(x.code))}</code><small class="mut" style="display:block">${x.n?fmtN(x.n)+' friend'+(x.n>1?'s':'')+' joined':'Not used yet'}</small></span><button class="sm" data-cpi="${esc(x.code)}">Copy</button>${navigator.share?`<button class="sm" data-shi="${esc(x.code)}">Share</button>`:''}<button class="sm bad" data-rvi="${esc(x.code)}" title="Delete this link">\u2715</button></div>`).join(''):''};
 const pendRows=()=>{const s=sentL();return s.length?'<label class="l">Pending requests</label>'+s.map(x=>`<div class="row"><span class="av s">${esc(dn(x.to)[0]||'?')}</span><span class="sp">${esc(dn(x.to))}<small class="mut" style="display:block">${x.ok?'Delivered \u2013 waiting for them to accept':'Waiting for them to come online\u2026'}</small></span><button class="sm" data-cancel="${esc(x.to)}">Cancel</button></div>`).join(''):''};
 
@@ -252,15 +275,26 @@ function doSoft(){if(!me)return;const a=document.activeElement;if(a&&/INPUT|SELE
 
 /* scan a user's slots and return the first open connection (null if nobody answers) */
 const addPend=(id,f)=>(NET.pend[id]=NET.pend[id]||[]).push(f),rmPend=(id,f)=>{const a=NET.pend[id];if(a){const i=a.indexOf(f);if(i>-1)a.splice(i,1);if(!a.length)delete NET.pend[id]}};
-function dial(name){return new Promise(res=>{let g=1,done=0;
- const next=()=>{if(done)return;if(!NET.peer||!NET.open||g>SLOTS){done=1;return res(null)}
-  const id=slotId(name,g++);let c,to,failed=0;
-  const fail=()=>{if(failed||done)return;failed=1;clearTimeout(to);rmPend(id,fail);try{c&&c.close()}catch(e){}next()};
-  try{c=NET.peer.connect(id,{reliable:true})}catch(e){return next()}
-  to=setTimeout(fail,4000);addPend(id,fail);
-  c.on('open',()=>{if(failed||done)return;done=1;clearTimeout(to);rmPend(id,fail);res(c)});
-  c.on('error',fail);c.on('close',fail)};
- next()})}
+/* Vibeo-style fast dial: knock on all slots AT ONCE, take whoever opens first (2.5s cap).
+   A stale slot no longer costs 4s before the next is tried. */
+function dial(name){return new Promise(res=>{
+ if(!NET.peer||!NET.open)return res(null);
+ let done=0,pending=0;const conns=[];
+ const finish=c=>{if(done)return;done=1;clearTimeout(to);
+  conns.forEach(x=>{if(x!==c){const f=x._fail;if(f)rmPend(x._id,f);try{x.close()}catch(e){}}});
+  res(c||null)};
+ const to=setTimeout(()=>finish(null),2500);
+ for(let g=1;g<=SLOTS;g++){
+  const id=slotId(name,g);let c;
+  try{c=NET.peer.connect(id,{reliable:true})}catch(e){continue}
+  c._id=id;conns.push(c);pending++;
+  const fail=()=>{if(done||c._dead)return;c._dead=1;rmPend(id,fail);if(--pending<=0&&!done)finish(null)};
+  c._fail=fail;addPend(id,fail);
+  c.on('open',()=>finish(c));
+  c.on('error',fail);c.on('close',fail);
+ }
+ if(!pending)finish(null);
+})}
 
 /* outbox delivery */
 let flushing=false,again=false;
@@ -613,7 +647,9 @@ ping();render()};
 /* side pane */
 document.querySelector('.tabs').onclick=e=>{const tb=e.target.closest('[data-t]'),t=tb&&tb.dataset.t;if(!t)return;tab=t;PA='f';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render()};
 function renderPane0(){const p=$('pane'),f=friends(me.name);
-if(tab==='fr'){p.innerHTML=`<button class="pri" id="gl" style="width:100%;margin-bottom:6px">\uFF0B Generate new link</button><div class="mut" style="font-size:12px;margin-bottom:6px">Makes a fresh invite link and copies it. Send it to a friend \u2013 when they open it, you get a request and choose whether to accept.</div><div class="mut" id="nst" style="font-size:12px;margin:2px 0 4px"></div>`+invRows()+`<label class="l">Got a friend's link?</label><div class="add"><input id="fa" placeholder="Paste the invite link"><button class="pri" id="fb">Add</button></div><div class="err" id="ferr"></div>`+pendRows()+`<div class="sec">Your friends (${fmtN(f.length)})</div>`+
+if(tab==='fr'){p.innerHTML=`<button class="pri" id="gl" style="width:100%;margin-bottom:6px">\uFF0B Generate new link</button><div class="mut" style="font-size:12px;margin-bottom:6px">Makes a fresh invite link and copies it. Send it to a friend \u2013 when they open it, you get a request and choose whether to accept.</div><div style="font-size:12px;margin:0 0 8px;padding:8px 10px;border-radius:9px;background:color-mix(in srgb,var(--a) 8%,transparent);color:var(--a)">\u26A1 Works instantly when <b>both of you are online at the same time</b> \u2013 just like a video call. If a request won't go through, use Troubleshoot below.</div><div class="mut" id="nst" style="font-size:12px;margin:2px 0 4px"></div>`+invRows()+
+`<div style="margin:12px 0 4px;padding:10px 12px;border:1px solid var(--b);border-radius:12px">${CFG.TURN.length?`<div style="font-size:12px;color:var(--ok);margin-bottom:6px">\u25CF Troubleshoot mode is ON \u2013 relay active for connecting</div>`:''}<button class="sm" id="tsBtn" style="width:100%">${CFG.TURN.length?'Make another troubleshoot link':'\uD83D\uDEE0 Troubleshoot \u2013 friend can\u2019t connect'}</button><div class="mut" style="font-size:11px;margin-top:6px">Turns on a relay and makes a special link for a friend on a strict network (school/parental). Share it on WhatsApp. Once connected it goes back to direct \u2013 the relay is barely used.</div><div id="tsbox"></div>${CFG.TURN.length?'<button class="sm bad" id="tsOff" style="width:100%;margin-top:6px">Turn troubleshoot mode off</button>':''}</div>`+
+`<label class="l">Got a friend's link?</label><div class="add"><input id="fa" placeholder="Paste the invite link"><button class="pri" id="fb">Add</button></div><div class="err" id="ferr"></div>`+pendRows()+`<div class="sec">Your friends (${fmtN(f.length)})</div>`+
 (f.map(n=>`<div class="row"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}<small class="mut" data-pst="${esc(n)}" style="display:block">${presLabel(n)}</small></span><button class="sm" data-chat="${esc(n)}">Message${UM[n]?`<span class="bdg">${fmtN(UM[n])}</span>`:''}</button><button class="sm bad" data-rm="${esc(n)}" title="Remove friend">\u2715</button></div>`).join('')||'<div class="empty">No friends yet. Tap Generate new link and send it, or paste a link from a friend above.</div>');netUI();
 }
 else if(tab==='ms'){const gs=grpL(),store=retMs()===0?MEM:rj('mc_msgs',{});
@@ -648,6 +684,12 @@ if(b.id==='fb'){const v=$('fa').value.trim();if(!v)return $('ferr').textContent=
 let qs;try{const m=/[?#&](add|join|inv)=/.exec(v);qs=m?'?'+v.slice(m.index+1):'?add='+encodeURIComponent(v)}catch(x){qs=''}
 sessionStorage.setItem('mc_pend',qs);$('fa').value='';linkIn()}
 if(b.id==='gl'){const c=genCode();setInv([...invL(),{code:c,t:Date.now()}]);copy(invLink(c));toast('New invite link copied');renderPane()}
+if(b.id==='tsBtn'){relayOn(false);const c=genCode();setInv([...invL(),{code:c,t:Date.now()}]);const link=tsLink(c);copy(link);
+ const box=$('tsbox');if(box)box.innerHTML=`<div style="margin-top:8px"><label class="l">Troubleshoot link – send on WhatsApp</label><div class="row"><span class="sp"><code style="word-break:break-all;font-size:11px">${esc(link)}</code></span><button class="sm" id="tsCopy">Copy</button>${navigator.share?'<button class="sm" id="tsShare">Share</button>':''}</div><small class="mut" style="display:block;margin-top:4px">Your friend pastes this into their "Got a friend's link?" box. The code word is read automatically and the relay helps you connect – then it drops back to direct.</small></div>`;
+ toast('Troubleshoot link copied');if(!CFG.TURN.length)renderPane()}
+if(b.id==='tsCopy'){const code=invL().slice(-1)[0];if(code)copy(tsLink(code.code))}
+if(b.id==='tsShare'){const code=invL().slice(-1)[0];if(code)navigator.share({title:'Join me on MiniCAD',text:'Open this troubleshoot link to connect with me on MiniCAD',url:tsLink(code.code)}).catch(()=>{})}
+if(b.id==='tsOff'){relayOff();toast('Troubleshoot mode off – back to direct peer-to-peer');renderPane()}
 if(b.dataset.cpi)copy(invLink(b.dataset.cpi));
 if(b.dataset.shi)navigator.share({title:'Join me on MiniCAD',text:'Open this link to become my friend on MiniCAD',url:invLink(b.dataset.shi)}).catch(()=>{});
 if(b.dataset.rvi){setInv(invL().filter(x=>x.code!==b.dataset.rvi));renderPane()}

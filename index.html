@@ -732,4 +732,4 @@ addEventListener('pagehide',()=>{if(me)netStop(!!window.__nav)});
 /* only touch the DOM when the markup really changed (keeps typing, scroll and focus; far fewer repaints) */
 (()=>{const d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');['mine','shared','pane','notes','jr'].forEach(id=>{const e=$(id);Object.defineProperty(e,'innerHTML',{configurable:true,get(){return d.get.call(e)},set(v){if(e._h===v)return;e._h=v;d.set.call(e,v)}})})})();
 boot();
-</script></body></html>  
+</script></body></html>

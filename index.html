@@ -337,7 +337,7 @@ function setOn(n,on){const p=PRES[n];if(!p)return;if(on)p.seenAt=Date.now();
  if(p.on!==on){p.on=on;presUI()}}
 function dropPres(n){const p=PRES[n];if(p&&p.c){try{p.c.close()}catch(e){}}delete PRES[n]}
 async function connectPres(n,p){p.busy=1;const c=await dial(n);p.busy=0;
- if(!c){p.fail=(p.fail||0)+1;p.next=Date.now()+Math.min(2500*p.fail,15000);if(Date.now()-(p.seenAt||0)>20000)setOn(n,false);return}
+ if(!c){p.fail=(p.fail||0)+1;p.next=Date.now()+Math.min(1000*p.fail,5000);if(Date.now()-(p.seenAt||0)>20000)setOn(n,false);return}
  p.fail=0;p.c=c;p.at=Date.now();
  c.on('data',m=>{if(m&&m.t==='pong'){p.at=Date.now();p.w=m.w==='b'?'b':'l';p.pid=String(m.pid||'');setOn(n,true);presUI()}else if(m&&m.t==='bye')gone(n)});
  c.on('close',()=>{if(p.c===c){p.c=null;if(Date.now()-(p.seenAt||0)>20000)setOn(n,false);p.next=Date.now()+1500;presUI()}});
@@ -357,7 +357,7 @@ function presTick(){
 function onConn(c){c.on('close',()=>{const p=c._pn&&PRES[c._pn];if(p&&p.inC===c){p.inC=null;p.inAt=0;presUI()}});
  c.on('data',m=>{if(!me||!m)return;
  if(m.t==='bye'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n)gone(n);return}
- if(m.t==='ping'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n){const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};c._pn=n;p.inC=c;p.inAt=Date.now();p.seenAt=Date.now();try{c.send({t:'pong',w:'l'})}catch(e){}presUI()}return}
+ if(m.t==='ping'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n){const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};c._pn=n;p.inC=c;p.inAt=Date.now();p.seenAt=Date.now();p.w=m.w==='b'?'b':'l';p.pid=String(m.pid||'');try{c.send({t:'pong',w:'l'})}catch(e){}presUI()}return}
  if(m.t==='binv')return gotBinv(c,m);
  if(m.t==='scq')return serveScene(c,m);if(m.t==='knock')return onKnock(c,m);if(m.t!=='env')return;let ok=false;try{ok=handle(m.e,c.peer)}catch(x){console.error(x)}
  if(ok){try{c.send({t:'ack',id:m.e.id})}catch(x){}softRender();ping()}})}
@@ -452,7 +452,7 @@ function sayBye(){try{Object.keys(PRES).forEach(n=>{const p=PRES[n];[p.c,p.inC].
 function netStop(quiet){if(!quiet)sayBye();clearInterval(NET.timer);NET.timer=0;NET.name=null;NET.open=false;NET.state='off';Object.keys(PRES).forEach(dropPres);if(NET.peer){try{NET.peer.destroy()}catch(e){}NET.peer=null}}
 function netStart(){if(!me||NET.name===me.name)return;netStop();NET.name=me.name;
  if(typeof Peer==='undefined'){NET.state='nolib';netUI();return}
- claim(1);NET.timer=setInterval(()=>{if(!me)return;if(NET.open){flush();presTick();window.__scT=(window.__scT||0)+1;if(window.__scT%4===0)scnScan().catch(()=>{})}else if(Date.now()-NET.t>12000)claim(1)},8000)}
+ claim(1);NET.timer=setInterval(()=>{if(!me)return;if(NET.open){flush();presTick();window.__scT=(window.__scT||0)+1;if(window.__scT%10===0)scnScan().catch(()=>{})}else if(Date.now()-NET.t>12000)claim(1)},3000)}
 function claim(g){
  if(!me||!NET.name)return;if(NET.peer){try{NET.peer.destroy()}catch(e){}NET.peer=null}
  NET.open=false;NET.state='connecting';NET.t=Date.now();netUI();

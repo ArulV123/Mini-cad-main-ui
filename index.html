@@ -17,7 +17,7 @@ button.bad{color:var(--bad)}button.sm{height:28px;padding:0 10px;font-size:12px;
 input{width:100%}input:focus,select:focus{outline:2px solid color-mix(in srgb,var(--a) 45%,transparent);border-color:var(--a)}input[type=checkbox]{width:16px;height:16px;padding:0;accent-color:var(--a)}
 svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .lg{width:30px;height:30px;flex:none}
-#veil{position:fixed;inset:0;background:var(--bg);z-index:999;opacity:1;pointer-events:none;transition:opacity .4s ease}#veil:not(.on){opacity:0}#veil.on{pointer-events:all}
+#veil{position:fixed;inset:0;background:var(--bg);z-index:999;opacity:1;pointer-events:none;transition:opacity .12s ease}#veil:not(.on){opacity:0}#veil.on{pointer-events:all}
 .view{animation:in .4s ease both}@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @view-transition{navigation:auto}.mut{color:var(--m)}.err{color:var(--bad);min-height:18px;font-size:12px}
 #login{min-height:100%;display:grid;grid-template-columns:1.1fr 1fr}
@@ -172,6 +172,7 @@ aside{background:var(--p)}.tabs{margin:10px;padding:4px;background:var(--h);bord
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 const DESIGN='https://arulv123.github.io/Mini-Cad/'; // the live designer; opened in the same tab with ?p=<project id>
+try{const l=document.createElement('link');l.rel='prefetch';l.href=DESIGN;document.head.appendChild(l)}catch(e){}
 const $=i=>document.getElementById(i),veil=$('veil');
 const rj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},wj=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -254,6 +255,7 @@ function relayDoneMaybe(){if(RELAY_AUTO&&CFG.TURN.length){setTimeout(()=>{if(REL
 const pid=n=>'mcad-'+[...String(n)].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join('');
 const slotId=(n,g)=>pid(n)+(g>1?'-'+g:'');
 const okPeer=(peer,n)=>{const p=pid(n);return peer===p||new RegExp('^'+p+'-\\d{1,2}$').test(String(peer))};
+const enc4=n=>'mcad4-'+String(n).toLowerCase().replace(/[^a-z0-9]/g,c=>'Z'+c.charCodeAt(0).toString(16)+'Z'),ok4=(peer,n)=>{const p=enc4(n);return peer===p||new RegExp('^'+p+'-\\d{1,2}$').test(String(peer))};
 const NET={peer:null,open:false,name:null,pend:{},timer:0,state:'off',t:0},PRES={};
 const outL=()=>rj('mc_out',[]).filter(e=>Date.now()-e.t<TTL),sentL=()=>me?(rj('mc_sent',{})[me.name]||[]).filter(e=>Date.now()-e.t<TTL):[],
 setSent=l=>{const a=rj('mc_sent',{});a[me.name]=l;wj('mc_sent',a)};
@@ -357,7 +359,7 @@ function presTick(){
 function onConn(c){c.on('close',()=>{const p=c._pn&&PRES[c._pn];if(p&&p.inC===c){p.inC=null;p.inAt=0;presUI()}});
  c.on('data',m=>{if(!me||!m)return;
  if(m.t==='bye'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n)gone(n);return}
- if(m.t==='ping'){const n=friends(me.name).find(x=>okPeer(c.peer,x));if(n){const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};c._pn=n;p.inC=c;p.inAt=Date.now();p.seenAt=Date.now();p.w=m.w==='b'?'b':'l';p.pid=String(m.pid||'');try{c.send({t:'pong',w:'l'})}catch(e){}presUI()}return}
+ if(m.t==='ping'){const n=friends(me.name).find(x=>okPeer(c.peer,x)||ok4(c.peer,x));if(n){const p=PRES[n]=PRES[n]||{on:false,at:0,c:null,busy:0,next:0};c._pn=n;p.inC=c;p.inAt=Date.now();p.seenAt=Date.now();p.w=m.w==='b'?'b':'l';p.pid=String(m.pid||'');try{c.send({t:'pong',w:'l'})}catch(e){}presUI()}return}
  if(m.t==='binv')return gotBinv(c,m);
  if(m.t==='scq')return serveScene(c,m);if(m.t==='knock')return onKnock(c,m);if(m.t!=='env')return;let ok=false;try{ok=handle(m.e,c.peer)}catch(x){console.error(x)}
  if(ok){try{c.send({t:'ack',id:m.e.id})}catch(x){}softRender();ping()}})}

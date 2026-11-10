@@ -139,6 +139,18 @@ aside{background:var(--p)}.tabs{margin:10px;padding:4px;background:var(--h);bord
 .ngb i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;font-style:normal;font-size:22px;flex:none}.ngb small{display:block;font-weight:400;color:var(--m)}
 @media(max-width:820px){.pane.inchat>.chat{height:calc(100vh - 170px);min-height:380px}}
 @media(prefers-reduced-motion:reduce){.pane.a-r,.pane.a-l,.pane.a-f,.msg.pop,.chat-r{animation:none!important}}
+
+.stack .av.s[data-pu]{background:#9aa3af;transition:background .4s,box-shadow .4s}
+.stack .av.s[data-pu].here{background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 0 0 2px #22c55e55}
+.proj.gen{animation:genin .6s ease both}
+.proj.gen .th{overflow:hidden}
+.genov{position:absolute;inset:0;z-index:3;display:grid;place-items:center;pointer-events:none;background:linear-gradient(110deg,#3b7cffcc 0%,#7a4dffcc 40%,#3b7cffcc 80%);background-size:250% 100%;color:#fff;font:600 13px system-ui;font-size:13px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);animation:genshim 1.1s linear infinite,genout .5s ease 1.8s forwards;animation-delay:var(--el),calc(1.8s + var(--el)),0s}
+.genov span{background:#0003;padding:5px 12px;border-radius:99px}
+.genov::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#fff1 0 2px,transparent 2px 6px);animation:genscan 1.6s linear infinite}
+@keyframes genshim{to{background-position:-250% 0}}
+@keyframes genout{to{opacity:0;filter:blur(6px)}}
+@keyframes genscan{to{transform:translateY(12px)}}
+@keyframes genin{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
 </style></head><body class="out">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mc" viewBox="0 0 64 64"><defs><linearGradient id="lgm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgm)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol><symbol id="i-uadd" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></symbol><symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></symbol></svg>
 <div id="veil" class="on"></div>
@@ -202,6 +214,9 @@ requestJoin(j,o,n)}}
 const friends=u=>{const a=rj('mc_friends',{})[u]||[];return a.length?a:(rj('mc_friends_bak',{})[u]||[])};
 const setFr=(u,l)=>{l=[...new Set(l)];const f=rj('mc_friends',{}),b=rj('mc_friends_bak',{});f[u]=l;b[u]=l;wj('mc_friends',f);wj('mc_friends_bak',b);setTimeout(()=>{try{presTick()}catch(e){}},300)};
 const notes=u=>rj('mc_notes',{})[u]||[];
+/* one invite per project is enough: ignore extra invites if one is already waiting or he is already in */
+const invSeen=pid=>{if(notes(me.name).some(x=>x.type==='project_invite'&&x.pid===pid&&!x.done))return true;const p=rj('mc_projects',[]).find(q=>q.id===pid);return !!(p&&(p.owner===me.name||(p.members||[]).some(m=>m.user===me.name&&m.status==='accepted')))};
+const clearInv=pid=>{if(!me)return;const l=notes(me.name);let ch=0;l.forEach(x=>{if(x.type==='project_invite'&&x.pid===pid&&!x.done){x.done='y';x.read=1;ch=1}});if(ch)setNotes(me.name,l)};
 const pushNote=(u,n)=>{const a=rj('mc_notes',{});(a[u]=a[u]||[]).unshift(Object.assign({id:rid(),t:Date.now(),read:0},n));wj('mc_notes',a);ping()};
 const setNotes=(u,l)=>{const a=rj('mc_notes',{});a[u]=l;wj('mc_notes',a)};
 const pkey=(a,b)=>[a,b].sort().join('|');
@@ -242,7 +257,8 @@ const okPeer=(peer,n)=>{const p=pid(n);return peer===p||new RegExp('^'+p+'-\\d{1
 const NET={peer:null,open:false,name:null,pend:{},timer:0,state:'off',t:0},PRES={};
 const outL=()=>rj('mc_out',[]).filter(e=>Date.now()-e.t<TTL),sentL=()=>me?(rj('mc_sent',{})[me.name]||[]).filter(e=>Date.now()-e.t<TTL):[],
 setSent=l=>{const a=rj('mc_sent',{});a[me.name]=l;wj('mc_sent',a)};
-function enq(to,k,d){const e={id:rid()+rid()+Date.now().toString(36),from:me.name,to,k,d:d||{},t:Date.now()};wj('mc_out',[...outL(),e]);flush();return e}
+function enq(to,k,d){if(k==='pinv'){const o=outL().find(x=>x.from===me.name&&x.to===to&&x.k==='pinv'&&x.d&&x.d.pid===(d||{}).pid);if(o){flush();return o}}
+ const e={id:rid()+rid()+Date.now().toString(36),from:me.name,to,k,d:d||{},t:Date.now()};wj('mc_out',[...outL(),e]);flush();if(k==='pinv'){setTimeout(flush,1500);setTimeout(flush,4000)}return e}
 function addFriend(a,code){
  if(friends(me.name).includes(a))return dn(a)+' is already your friend';
  const l=notes(me.name),inc=l.find(x=>x.type==='friend_request'&&x.from===a&&!x.done);
@@ -268,7 +284,7 @@ function netUI(){const e=document.getElementById('nst');if(!e)return;const s=NET
 const isOn=n=>{const p=PRES[n];return !!p&&(!!p.on||Date.now()-(p.inAt||0)<(document.hidden?9e4:25e3))};
 function presLabel(n){if(isOn(n)){const w=(PRES[n]||{}).w;return w==='b'?'<b style="color:#f5a623">\u25CF</b> In the builder':'<b style="color:#1fa971">\u25CF</b> Online'}const p=PRES[n]||{},t=Math.max(p.seenAt||0,p.inAt||0,(rj('mc_ls',{})[me.name+'|'+n])||0);
  return '<b style="color:#98a2b3">\u25CF</b> Offline'+(t?' \u00B7 last seen '+ago(t):'')}
-function presUI(){if(!me)return;document.querySelectorAll('[data-pst]').forEach(e=>{e.innerHTML=presLabel(e.dataset.pst)})}
+function presUI(){if(!me)return;paintAv();document.querySelectorAll('[data-pst]').forEach(e=>{e.innerHTML=presLabel(e.dataset.pst)})}
 let rT=0,rDirty=0;
 function softRender(){if(rT)return;rT=setTimeout(()=>{rT=0;if(document.hidden){rDirty=1;return}doSoft()},150)}
 function doSoft(){if(!me)return;const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&$('pane').contains(a)){prep();renderProjects();renderNotes();netUI();presUI();return}render()}
@@ -323,7 +339,7 @@ function dropPres(n){const p=PRES[n];if(p&&p.c){try{p.c.close()}catch(e){}}delet
 async function connectPres(n,p){p.busy=1;const c=await dial(n);p.busy=0;
  if(!c){p.fail=(p.fail||0)+1;p.next=Date.now()+Math.min(2500*p.fail,15000);if(Date.now()-(p.seenAt||0)>20000)setOn(n,false);return}
  p.fail=0;p.c=c;p.at=Date.now();
- c.on('data',m=>{if(m&&m.t==='pong'){p.at=Date.now();p.w=m.w==='b'?'b':'l';setOn(n,true);presUI()}else if(m&&m.t==='bye')gone(n)});
+ c.on('data',m=>{if(m&&m.t==='pong'){p.at=Date.now();p.w=m.w==='b'?'b':'l';p.pid=String(m.pid||'');setOn(n,true);presUI()}else if(m&&m.t==='bye')gone(n)});
  c.on('close',()=>{if(p.c===c){p.c=null;if(Date.now()-(p.seenAt||0)>20000)setOn(n,false);p.next=Date.now()+1500;presUI()}});
  c.on('error',()=>{});
  try{c.send({t:'ping'})}catch(e){}}
@@ -414,7 +430,7 @@ function handle(e,peer){
  else if(e.k==='fr_dec'){if(asked){setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:d.why==='link'?'The invite link from '+dn(f)+' is no longer valid':dn(f)+' declined your friend request'})}}
  else if(e.k==='fr_rm'){if(isF){setFr(me.name,fl.filter(x=>x!==f));pushNote(me.name,{type:'info',text:dn(f)+' removed you from their friends on '+fmt(+d.at||Date.now())});cutProjects(f,false,+d.at||Date.now());toast(dn(f)+' removed you')}}
  else if(e.k==='chat'){if(isF){addMsg(pkey(me.name,f),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now(),tag:d.tag==='all'?'all':undefined});if(!(tab==='ms'&&chatWith===f&&!document.hidden)){toast('New message from '+dn(f));chime()}}}
- else if(e.k==='pinv'){if(isF&&/^[\w-]{3,40}$/.test(d.pid||''))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer'})}
+ else if(e.k==='pinv'){if(isF&&/^[\w-]{3,40}$/.test(d.pid||'')&&!invSeen(d.pid))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer'})}
  else if(e.k==='jadm'){const key=(d.pid||'')+'|'+f;if(jaskL().includes(key)&&/^[\w-]{3,40}$/.test(d.pid||'')){const j=JOIN.cur&&JOIN.cur.pid===d.pid&&JOIN.cur.owner===f?JOIN.cur:null;
   if(d.yes){if(j)finishJoin(j,d.role);else{addShared(d.pid,String(d.name||'Project').slice(0,40),f,d.role);jaskSet(jaskL().filter(x=>x!==key));pushNote(me.name,{type:'info',text:dn(f)+' let you into \u201c'+String(d.name||'Project').slice(0,40)+'\u201d'})}}
   else{if(j)joinDenied(j);else jaskSet(jaskL().filter(x=>x!==key))}}}
@@ -425,6 +441,7 @@ function handle(e,peer){
  else if(e.k==='gleave'){const gs=grpL(),g=gs.find(x=>x.id===d.gid);if(g&&g.members.includes(f)){g.members=g.members.filter(x=>x!==f);setGrp(gs);sysMsg('g:'+g.id,dn(f)+' left')}}
  else if(e.k==='gchat'){const g=grpL().find(x=>x.id===d.gid);if(g&&g.members.includes(f)&&g.members.includes(me.name)){addMsg(ckey('g:'+g.id),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now()});if(!(tab==='ms'&&chatWith==='g:'+g.id&&!document.hidden)){toast(dn(f)+' in '+g.name);chime()}}}
  else if(e.k==='scn'){scnRecv(f,d).catch(x=>console.error(x))}
+ else if(e.k==='prn'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===f);if(isF&&p&&typeof d.name==='string'&&d.name.trim()){p.name=d.name.trim().slice(0,40);wj('mc_projects',ps);try{bc&&bc.postMessage(1)}catch(x){}render()}}
  else if(e.k==='presp'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===me.name),m=p&&p.members.find(q=>q.user===f);
   if(m){m.status=d.yes?'accepted':'declined';wj('mc_projects',ps);pushNote(me.name,{type:'info',text:`${dn(f)} ${d.yes?'joined':'declined'} "${p.name}"`})}}
  return true}
@@ -460,9 +477,13 @@ const jaskL=()=>me?(rj('mc_jasked',{})[me.name]||[]):[],jaskSet=l=>{const a=rj('
 const setJD=t=>{const e=$('jwd');if(e)e.textContent=t};
 const chime=()=>{try{const A=window.AudioContext||window.webkitAudioContext,a=chime.a=chime.a||new A(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1175,t+.12);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.15,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.45);o.start();o.stop(t+.5)}catch(e){}};
 function joinUI(t,s,opt){opt=opt||{};const w=$('jw');w.hidden=false;
- w.innerHTML=`<div class="jc">${opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small><button id="jwc" class="${opt.bad?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad?'Back to projects':'Cancel'}</button></div>`;
- $('jwc').onclick=leaveJoin}
-function leaveJoin(){const j=JOIN.cur;JOIN.cur=null;if(j){clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner))}$('jw').hidden=true;try{history.replaceState(null,'',location.pathname)}catch(e){}}
+ w.innerHTML=`<div class="jc">${opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small>${opt.bad||opt.nobtn?'':'<button id="jwr" class="pri" style="min-width:110px;margin-right:8px">Retry</button>'}<button id="jwc" class="${opt.bad?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad?'Back to projects':'Cancel'}</button></div>`;
+ $('jwc').onclick=leaveJoin;if($('jwr'))$('jwr').onclick=joinRetry}
+/* Retry: reconnect now; uses the troubleshoot relay ONLY until the host answers (or 20s), then drops back to peer-to-peer so almost no quota is used */
+let jrT=0;const endRelay=()=>{clearTimeout(jrT);if(RELAY_AUTO)relayOff()};
+function joinRetry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}j.c=null;setJD('Retrying\u2026');
+ relayOn(true);clearTimeout(jrT);jrT=setTimeout(endRelay,20000);joinTry()}
+function leaveJoin(){endRelay();const j=JOIN.cur;JOIN.cur=null;if(j){clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner))}$('jw').hidden=true;try{history.replaceState(null,'',location.pathname)}catch(e){}}
 function requestJoin(pid,owner,name){
  if(JOIN.cur&&JOIN.cur.pid===pid)return;leaveJoin();
  const j=JOIN.cur={pid,owner,name,c:null,t:0,t0:Date.now()};
@@ -476,6 +497,7 @@ function joinTry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);
   if(!c){setJD('The host is not online yet \u2013 still trying ('+Math.round((Date.now()-j.t0)/1000)+'s)');return retry(3000)}
   j.c=c;
   c.on('data',m=>{if(JOIN.cur!==j||!m)return;
+   if(m.t==='wait'||m.t==='welcome'||m.t==='denied')endRelay();
    if(m.t==='wait')joinUI('Waiting for the host\u2026','<b>'+esc(dn(j.owner))+'</b> has been asked. You will get in as soon as they admit you.');
    else if(m.t==='welcome')finishJoin(j,m.role);
    else if(m.t==='denied')joinDenied(j,m.reason)});
@@ -483,7 +505,7 @@ function joinTry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);
   try{c.send({t:'knock',name:me.name,pid:j.pid,pn:j.name})}catch(e){retry(1500)}})}
 function addShared(pid,name,owner,role){const ps=rj('mc_projects',[]);let p=ps.find(x=>x.id===pid);
  if(!p){p={id:pid,name,owner,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}
- let m=p.members.find(x=>x.user===me.name);if(!m){m={user:me.name};p.members.push(m)}m.role=ROLES.includes(role)?role:'Builder';m.status='accepted';wj('mc_projects',ps)}
+ let m=p.members.find(x=>x.user===me.name);if(!m){m={user:me.name};p.members.push(m)}m.role=ROLES.includes(role)?role:'Builder';m.status='accepted';wj('mc_projects',ps);clearInv(pid)}
 function finishJoin(j,role){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}
  addShared(j.pid,j.name,j.owner,role);jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
  joinUI('You are in!','Opening the designer\u2026',{nobtn:1});setTimeout(()=>go(DESIGN+'?p='+encodeURIComponent(j.pid)),700)}
@@ -603,19 +625,32 @@ $('hname').textContent=dn(me.name);$('gr').innerHTML='Hi, '+esc(dn(me.name))+'<s
 
 /* render */
 function render(){if(!me)return;prep();renderProjects();renderNotes();renderPane()}
+const RT={};const unsent=pid=>me&&outL().some(e=>e.from===me.name&&e.k==='pinv'&&e.d&&e.d.pid===pid);
+/* tries 1-2: normal retry. 3rd try: troubleshoot relay, only until the invite is delivered (max 20s), then back to peer-to-peer */
+function retryInv(pid){const n=RT[pid]||0;RT[pid]=n+1;
+ if(n>=2){relayOn(true);toast('Troubleshoot: sending the invite via relay…');const t0=Date.now(),iv=setInterval(()=>{if(!unsent(pid)||Date.now()-t0>20000){clearInterval(iv);if(RELAY_AUTO)relayOff();if(!unsent(pid))RT[pid]=0;render()}},1000)}
+ else toast('Retrying invite…');
+ setTimeout(flush,n>=2?800:0);render()}
+/* project circles: grey = not in this project's builder, green = inside THIS project's builder right now */
+const GEN={};
+function whereIs(n,pid){const q=PRES[n];if(!q||!isOn(n))return 'off';return q.w==='b'?(q.pid===pid?'here':'other'):'lobby'}
+const WTXT={here:'In this project now',other:'In another project',lobby:'Online – on the projects page',off:'Not in this project'};
+function paintAv(){document.querySelectorAll('.av[data-pu]').forEach(e=>{const w=whereIs(e.dataset.pu,e.dataset.pp);e.classList.toggle('here',w==='here');e.title=(e.dataset.pn||e.dataset.pu)+' – '+WTXT[w]})}
 function card(p,mine){const r=mine?'Owner':(p.members.find(m=>m.user===me.name)||{}).role,acc=p.members.filter(m=>m.status==='accepted'),ppl=[p.owner,...acc.map(m=>m.user)],pend=p.members.filter(m=>m.status==='pending').length;
-return `<article class="proj"><div class="th" data-open="${p.id}" style="${p.thumb?`background-image:url(${p.thumb})`:''}">${p.thumb?'':'<svg class="ph"><use href="#mc"/></svg>'}<span class="go">Open designer →</span></div>
+const ge=GEN[p.id]&&Date.now()-GEN[p.id]<2300?Date.now()-GEN[p.id]:-1;
+return `<article class="proj${ge>=0?' gen':''}"${ge>=0?' data-gen="1"':''}><div class="th" data-open="${p.id}" style="${p.thumb?`background-image:url(${p.thumb})`:''}">${p.thumb?'':'<svg class="ph"><use href="#mc"/></svg>'}${ge>=0?`<div class="genov" style="--el:-${ge}ms"><span>Creating project…</span></div>`:''}<span class="go">Open designer →</span></div>
 <div class="pi"><div class="pt"><b>${esc(p.name)}</b>${mine?`<span class="ib"><button data-ren="${p.id}" title="Rename"><svg class="i"><use href="#i-edit"/></svg></button><button class="bad" data-del="${p.id}" title="Delete"><svg class="i"><use href="#i-trash"/></svg></button></span>`:''}</div><small>${mine?'':'by '+esc(dn(p.owner)||'a friend')+' · '}${p.updated?'Saved '+fmt(p.updated):'Created '+fmt(p.created)}</small>
-<div class="pa"><span class="stack">${ppl.slice(0,4).map(n=>`<span class="av s" title="${esc(dn(n))}">${esc(dn(n)[0]||'?')}</span>`).join('')}</span><span class="tag">${esc(r)}</span><span class="sp"></span><button class="inv" data-cp="${p.id}" title="Copy a link to this project">🔗 Copy link</button>${mine?`<button class="inv" data-inv="${p.id}" title="Add friends to this project"><svg class="i"><use href="#i-uadd"/></svg>Invite${pend?` <em>${fmtN(pend)}</em>`:''}</button>`:`<button class="sm" data-open="${p.id}">Open</button>`}</div></div></article>`}
+<div class="pa"><span class="stack">${ppl.slice(0,4).map(n=>`<span class="av s" data-pu="${esc(n)}" data-pp="${p.id}" data-pn="${esc(dn(n))}" title="${esc(dn(n))}">${esc(dn(n)[0]||'?')}</span>`).join('')}</span><span class="tag">${esc(r)}</span><span class="sp"></span>${mine&&unsent(p.id)?`<button class="inv" data-rt="${p.id}" title="Invite not delivered yet">${(RT[p.id]||0)>=2?'🛠 Troubleshoot':'↻ Retry'}</button>`:''}<button class="inv" data-cp="${p.id}" title="Copy a link to this project">🔗 Copy link</button>${mine?`<button class="inv" data-inv="${p.id}" title="Add friends to this project"><svg class="i"><use href="#i-uadd"/></svg>Invite${pend?` <em>${fmtN(pend)}</em>`:''}</button>`:`<button class="sm" data-open="${p.id}">Open</button>`}</div></div></article>`}
 function renderProjects(){const ps=rj('mc_projects',[]),mine=ps.filter(p=>p.owner===me.name),sh=ps.filter(p=>p.owner!==me.name&&p.members.some(m=>m.user===me.name&&m.status==='accepted'));
 $('mine').innerHTML='<div class="newt" data-new="1"><i><svg class="i"><use href="#i-plus"/></svg></i>Create project<small>Opens the designer instantly</small></div>'+mine.map(p=>card(p,1)).join('');
-$('shared').innerHTML=sh.map(p=>card(p,0)).join('')||'<div class="empty">Projects friends add you to will show here.</div>'}
+$('shared').innerHTML=sh.map(p=>card(p,0)).join('')||'<div class="empty">Projects friends add you to will show here.</div>';paintAv()}
 document.addEventListener('click',e=>{const t=e.target,d=t.closest('[data-del]'),i=t.closest('[data-inv]'),rn=t.closest('[data-ren]'),o=t.closest('[data-open]'),cp=t.closest('[data-cp]');
+const rt=t.closest('[data-rt]');if(rt)return retryInv(rt.dataset.rt);
 if(cp){const q=rj('mc_projects',[]).find(x=>x.id===cp.dataset.cp);if(q)copy(projLink(q))}
 else if(d){if(!confirm('Delete this project and its saved design?'))return;const id=d.dataset.del;wj('mc_projects',rj('mc_projects',[]).filter(p=>p.id!==id));
 try{const r=indexedDB.open('minicad',1);r.onupgradeneeded=()=>r.result.createObjectStore('scenes');r.onsuccess=()=>{const x=r.result.transaction('scenes','readwrite');x.objectStore('scenes').delete(id)}}catch(x){}render()}
 else if(i)picker(i.dataset.inv);
-else if(rn){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===rn.dataset.ren),n=prompt('Rename project:',p.name);if(n&&n.trim()){p.name=n.trim().slice(0,40);wj('mc_projects',ps);render()}}
+else if(rn){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===rn.dataset.ren),n=prompt('Rename project:',p.name);if(n&&n.trim()){p.name=n.trim().slice(0,40);wj('mc_projects',ps);(p.members||[]).filter(m=>m.status==='accepted'&&m.user!==me.name).forEach(m=>enq(m.user,'prn',{pid:p.id,name:p.name}));try{bc&&bc.postMessage(1)}catch(x){}render()}}
 else if(t.closest('[data-new]'))quick();
 else if(o)go(DESIGN+'?p='+o.dataset.open)});
 
@@ -640,7 +675,7 @@ const id=b.dataset.na;if(!id)return;const l=notes(me.name),n=l.find(x=>x.id===id
 if(n.type==='friend_request'){if(yes){setFr(me.name,[...friends(me.name),n.from]);if(n.code)setInv(invL().map(x=>x.code===n.code?Object.assign(x,{n:(x.n||0)+1}):x))}enq(n.from,yes?'fr_acc':'fr_dec',{})}
 if(n.type==='project_invite'){const ps=rj('mc_projects',[]);let p=ps.find(q=>q.id===n.pid);
 if(yes){if(!p){p={id:n.pid,name:n.name,owner:n.from,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}
-let m=p.members.find(q=>q.user===me.name);if(!m){m={user:me.name,role:n.role};p.members.push(m)}m.role=n.role;m.status='accepted';wj('mc_projects',ps)}
+let m=p.members.find(q=>q.user===me.name);if(!m){m={user:me.name,role:n.role};p.members.push(m)}m.role=n.role;m.status='accepted';wj('mc_projects',ps);clearInv(n.pid);GEN[n.pid]=Date.now();setTimeout(()=>{const g=document.querySelector('[data-gen]');if(g)g.scrollIntoView({behavior:'smooth',block:'center'})},60);setTimeout(render,2350)}
 enq(n.from,'presp',{pid:n.pid,yes:yes?1:0})}
 ping();render()};
 

@@ -490,6 +490,12 @@ function handle(e,peer){
  else if(e.k==='prn'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===f);if(isF&&p&&typeof d.name==='string'&&d.name.trim()){p.name=d.name.trim().slice(0,40);wj('mc_projects',ps);try{bc&&bc.postMessage(1)}catch(x){}render()}}
  else if(e.k==='presp'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===me.name),m=p&&p.members.find(q=>q.user===f);
   if(m){m.status=d.yes?'accepted':'declined';wj('mc_projects',ps);pushNote(me.name,{type:'info',text:`${dn(f)} ${d.yes?'joined':'declined'} "${p.name}"`})}}
+ else if(e.k==='prole'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===f),m=p&&p.members.find(q=>q.user===me.name);
+  if(m&&ROLES.includes(d.role)&&m.role!==d.role){m.role=d.role;wj('mc_projects',ps);pushNote(me.name,{type:'info',text:dn(f)+' changed your role in \u201c'+p.name+'\u201d to '+d.role});try{bc&&bc.postMessage(1)}catch(x){}render()}}
+ else if(e.k==='pkick'){const nl=notes(me.name);nl.forEach(x=>{if(x.type==='project_invite'&&x.pid===d.pid&&x.from===f&&!x.done){x.done='n';x.read=1}});setNotes(me.name,nl);
+  const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===f);
+  if(p&&(+d.at||Date.now())>=(p.joinedAt||0)){wj('mc_projects',ps.filter(q=>q!==p));idbDel(p.id);const sent=rj('mc_scn_sent',{});Object.keys(sent).forEach(k=>{if(k.startsWith(p.id+'|'))delete sent[k]});wj('mc_scn_sent',sent);
+   pushNote(me.name,{type:'info',text:dn(f)+' removed you from \u201c'+p.name+'\u201d on '+fmt(+d.at||Date.now())});try{bc&&bc.postMessage(1)}catch(x){}softRender();kickedUI({pid:p.id,owner:f,name:p.name})}}
  return true}
 
 /* own connection: claim slot 1, fall back to the next slot if the server still holds a stale id */
@@ -554,7 +560,7 @@ function joinTry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);
   try{c.send({t:'knock',name:me.name,pid:j.pid,pn:j.name})}catch(e){retry(1500)}})}
 function addShared(pid,name,owner,role,ah){const ps=rj('mc_projects',[]);let p=ps.find(x=>x.id===pid);
  if(!p){p={id:pid,name,owner,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}
- if(typeof ah==='boolean')p.allowHostLeave=ah;let m=p.members.find(x=>x.user===me.name);if(!m){m={user:me.name};p.members.push(m)}m.role=ROLES.includes(role)?role:'Builder';m.status='accepted';wj('mc_projects',ps);clearInv(pid)}
+ if(typeof ah==='boolean')p.allowHostLeave=ah;let m=p.members.find(x=>x.user===me.name);if(!m){m={user:me.name};p.members.push(m)}m.role=ROLES.includes(role)?role:'Builder';m.status='accepted';p.joinedAt=Date.now();wj('mc_projects',ps);clearInv(pid)}
 function finishJoin(j,role,ah){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}
  addShared(j.pid,j.name,j.owner,role,ah);jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
  if(ah===false&&whereIs(j.owner,j.pid)!=='here'){joinUI('You are in!','This project is locked until <b>'+esc(dn(j.owner))+'</b> is inside it.',{lock:1});render();return}
@@ -780,7 +786,7 @@ const id=b.dataset.na;if(!id)return;const l=notes(me.name),n=l.find(x=>x.id===id
 if(n.type==='friend_request'){if(yes){setFr(me.name,[...friends(me.name),n.from]);if(n.code)setInv(invL().map(x=>x.code===n.code?Object.assign(x,{n:(x.n||0)+1}):x))}enq(n.from,yes?'fr_acc':'fr_dec',{})}
 if(n.type==='project_invite'){const ps=rj('mc_projects',[]);let p=ps.find(q=>q.id===n.pid);
 if(yes){if(!p){p={id:n.pid,name:n.name,owner:n.from,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}p.allowHostLeave=n.ah!==false;
-let m=p.members.find(q=>q.user===me.name);if(!m){m={user:me.name,role:n.role};p.members.push(m)}m.role=n.role;m.status='accepted';wj('mc_projects',ps);clearInv(n.pid);GEN[n.pid]=Date.now();setTimeout(()=>{const g=document.querySelector('[data-gen]');if(g)g.scrollIntoView({behavior:'smooth',block:'center'})},60);setTimeout(render,2350)}
+let m=p.members.find(q=>q.user===me.name);if(!m){m={user:me.name,role:n.role};p.members.push(m)}m.role=n.role;m.status='accepted';p.joinedAt=Date.now();wj('mc_projects',ps);clearInv(n.pid);GEN[n.pid]=Date.now();setTimeout(()=>{const g=document.querySelector('[data-gen]');if(g)g.scrollIntoView({behavior:'smooth',block:'center'})},60);setTimeout(render,2350)}
 enq(n.from,'presp',{pid:n.pid,yes:yes?1:0})}
 ping();render()};
 
@@ -853,14 +859,24 @@ function send(){const t=$('mt').value.trim();if(!t||!chatWith)return;const now=D
 const mkProj=(name,mem,ah)=>{const ps=rj('mc_projects',[]),p={id:'p'+Date.now().toString(36)+rid().slice(0,3),name,owner:me.name,members:mem||[],allowHostLeave:!!ah,created:Date.now()};ps.push(p);wj('mc_projects',ps);(mem||[]).forEach(x=>enq(x.user,'pinv',{pid:p.id,name,role:x.role,ah:!!ah}));return p};
 const quick=()=>{const n=rj('mc_projects',[]).filter(p=>p.owner===me.name).length+1;go(DESIGN+'?p='+mkProj('Untitled project '+n).id)};$('newp').onclick=quick;
 $('newf').onclick=()=>picker(null);
+function kickMember(pid,user){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===pid&&q.owner===me.name);if(!p)return;
+ p.members=p.members.filter(x=>x.user!==user);wj('mc_projects',ps);
+ const sent=rj('mc_scn_sent',{});delete sent[pid+'|'+user];wj('mc_scn_sent',sent);
+ wj('mc_out',outL().filter(e=>!(e.from===me.name&&e.to===user&&(e.k==='pinv'||e.k==='scn')&&e.d&&e.d.pid===pid)));
+ const c=LOBBY[pid+'|'+user];if(c){delete LOBBY[pid+'|'+user];try{c.close()}catch(e){}}
+ enq(user,'pkick',{pid,at:Date.now()});pushNote(me.name,{type:'info',text:dn(user)+' was removed from \u201c'+p.name+'\u201d ('+fmt(Date.now())+')'});try{bc&&bc.postMessage(1)}catch(e){}}
+function setRole(pid,user,role){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===pid&&q.owner===me.name),x=p&&p.members.find(q=>q.user===user);
+ if(!x||!ROLES.includes(role)||x.role===role)return;x.role=role;wj('mc_projects',ps);enq(user,'prole',{pid,role});try{bc&&bc.postMessage(1)}catch(e){}render()}
 function picker(pid){const ps=rj('mc_projects',[]),pr=pid&&ps.find(p=>p.id===pid),taken=pr?pr.members.map(m=>m.user):[],f=friends(me.name).filter(n=>!taken.includes(n)),m=document.createElement('div');m.className='modal';
-m.innerHTML=`<div class="card"><h3>${pr?'Add friends to “'+esc(pr.name)+'”':'New project with friends'}</h3><div class="mut">Choose who joins and what they can do.</div>
+m.innerHTML=`<div class="card"><h3>${pr?'Manage “'+esc(pr.name)+'”':'New project with friends'}</h3><div class="mut">${pr?'Add friends, change roles, remove people, or change whether the project stays open.':'Choose who joins and what they can do.'}</div>
 ${pr?'':'<label class="l">Project name</label><input id="pn" maxlength="40" placeholder="e.g. Gear bearing">'}
-${pr&&pr.members.length?`<label class="l">Already invited</label>${pr.members.map(x=>`<div class="row"><span class="av s">${esc(dn(x.user)[0]||'?')}</span><span class="sp">${esc(dn(x.user))}</span><span class="tag">${esc(x.role)}</span><span class="tag ${x.status==='accepted'?'ok':''}">${esc(x.status)}</span></div>`).join('')}`:''}
+${pr&&pr.members.length?`<label class="l">Members</label>${pr.members.map(x=>`<div class="row"><span class="av s">${esc(dn(x.user)[0]||'?')}</span><span class="sp">${esc(dn(x.user))}</span>${x.status==='accepted'?`<select data-mr="${esc(x.user)}" style="height:30px">${ROLES.map(r=>`<option${x.role===r?' selected':''}>${r}</option>`).join('')}</select>`:`<span class="tag">${esc(x.role)}</span><span class="tag">${esc(x.status)}</span>`}<button class="sm bad" data-mk="${esc(x.user)}" title="Remove from this project">Remove</button></div>`).join('')}`:''}
 <label class="l">Friends</label><div>${f.map(n=>`<div class="row"><input type="checkbox" data-u="${esc(n)}"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}</span><select data-r="${esc(n)}" style="height:30px">${ROLES.map(r=>`<option${r==='Builder'?' selected':''}>${r}</option>`).join('')}</select></div>`).join('')||'<div class="empty">No friends to add. Add friends from the Friends tab first.</div>'}</div>
 <label class="sw"><input type="checkbox" id="ah" ${!pr||pr.allowHostLeave!==false?'checked':''}><span><b><svg class="i" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;color:var(--a)"><use href="#i-lock"/></svg>Keep project open when I leave</b><br><small class="mut">Members can enter and keep working even if the host is offline. Untick it and the project stays locked for members until you are inside it.</small></span></label>
-<div class="err" id="perr"></div><div class="mact"><button id="pc">Cancel</button>${pr?'':'<button class="alt" id="pk2">Create</button>'}${pr?'<button class="pri" id="pk">Add to project</button>':''}</div></div>`;
+<div class="err" id="perr"></div><div class="mact"><button id="pc">Cancel</button>${pr?'':'<button class="alt" id="pk2">Create</button>'}${pr?'<button class="pri" id="pk">Save changes</button>':''}</div></div>`;
 document.body.appendChild(m);if($('pn'))$('pn').focus();$('pc').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+if(pr){m.querySelectorAll('[data-mr]').forEach(sel=>sel.onchange=()=>setRole(pid,sel.dataset.mr,sel.value));
+ m.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>{const u=b.dataset.mk;if(!confirm('Remove '+dn(u)+' from \u201c'+pr.name+'\u201d?\n\nThey lose access and their copy is deleted from their device.'))return;kickMember(pid,u);m.remove();render();picker(pid)})}
 const submit=open=>{const mem=[...m.querySelectorAll('[data-u]:checked')].map(c=>({user:c.dataset.u,role:m.querySelector(`[data-r="${c.dataset.u}"]`).value,status:'pending'})),ah=$('ah').checked;
 if(pr){const ps2=rj('mc_projects',[]),p=ps2.find(q=>q.id===pid);const was=p.allowHostLeave!==false;p.members.push(...mem);p.allowHostLeave=ah;wj('mc_projects',ps2);if(was!==ah)p.members.filter(x=>x.user!==me.name&&!mem.includes(x)).forEach(x=>enq(x.user,'pah',{pid:p.id,ah}));mem.forEach(x=>enq(x.user,'pinv',{pid:p.id,name:p.name,role:x.role,ah}));m.remove();render();return}
 const name=$('pn').value.trim();if(!name)return $('perr').textContent='Give the project a name';m.remove();const np=mkProj(name,mem,ah);

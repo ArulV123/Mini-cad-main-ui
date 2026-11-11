@@ -242,8 +242,7 @@ const q=new URLSearchParams(s),a=q.get('add'),j=q.get('join'),iv=q.get('inv'),iu
 if(iv){if(!/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/.test(iv)||!/^[\w.~-]{2,40}$/.test(iu||''))return toast('That link is not valid');
 if(iu===me.name)return toast('That is your own link');
 /* troubleshoot link: the code word is read automatically; turn the relay on just long enough to connect, then it drops back to peer-to-peer */
-if(ts)relayOn(true);
-tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));const r=addFriend(iu,iv);render();if(ts)relayDoneMaybe();return toast(ts?'Troubleshoot code read – connecting via relay…':r)}
+tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));const r=addFriend(iu,iv);render();return toast(ts?r+' – if it does not connect, press Troubleshoot':r)}
 if(a){if(!/^[\w.~-]{2,40}$/.test(a))return toast('That link is not valid');
 if(a===me.name)return toast('That is your own link');
 tab='fr';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='fr'));const r=addFriend(a);render();return toast(r)}
@@ -256,7 +255,7 @@ requestJoin(j,o,n)}}
 
 /* data helpers (all in localStorage; keyed by username so a backend/WebRTC layer can replace them later) */
 const friends=u=>{const a=rj('mc_friends',{})[u]||[];return a.length?a:(rj('mc_friends_bak',{})[u]||[])};
-const setFr=(u,l)=>{l=[...new Set(l)];const f=rj('mc_friends',{}),b=rj('mc_friends_bak',{});f[u]=l;b[u]=l;wj('mc_friends',f);wj('mc_friends_bak',b);setTimeout(()=>{try{presTick()}catch(e){}},300)};
+const setFr=(u,l)=>{l=[...new Set(l)];{const old=friends(u),t=rj('mc_frt',{});l.forEach(x=>{if(!old.includes(x))t[u+'|'+x]=Date.now()});wj('mc_frt',t)}const f=rj('mc_friends',{}),b=rj('mc_friends_bak',{});f[u]=l;b[u]=l;wj('mc_friends',f);wj('mc_friends_bak',b);setTimeout(()=>{try{presTick()}catch(e){}},300)};
 const notes=u=>rj('mc_notes',{})[u]||[];
 /* one invite per project is enough: ignore extra invites if one is already waiting or he is already in */
 const invSeen=pid=>{if(notes(me.name).some(x=>x.type==='project_invite'&&x.pid===pid&&!x.done))return true;const p=rj('mc_projects',[]).find(q=>q.id===pid);return !!(p&&(p.owner===me.name||(p.members||[]).some(m=>m.user===me.name&&m.status==='accepted')))};
@@ -437,15 +436,16 @@ function rmWarn(n){const ps=rj('mc_projects',[]),leave=ps.filter(p=>p.owner===n)
  if(drop.length)t+='\n\n\u2022 '+dn(n)+' will be REMOVED from your projects and their copy deleted:\n   '+drop.join(', ');
  return t+'\n\n'+dn(n)+' will be notified. This cannot be undone.'}
 /* a friendship ended: leave the other person's projects (and wipe their data from this device) and drop them from mine */
-function cutProjects(f,byMe,at){at=at||Date.now();const ps=rj('mc_projects',[]),keep=[],sent=rj('mc_scn_sent',{});
+function cutProjects(f,byMe,at){at=at||Date.now();const ps=rj('mc_projects',[]),keep=[],sent=rj('mc_scn_sent',{});let kicked=null;
  ps.forEach(p=>{
-  if(p.owner===f&&p.id){idbDel(p.id);Object.keys(sent).forEach(k=>{if(k.startsWith(p.id+'|'))delete sent[k]});
+  if(p.owner===f&&p.id){if(!byMe&&!kicked)kicked={pid:p.id,owner:p.owner,name:p.name};idbDel(p.id);Object.keys(sent).forEach(k=>{if(k.startsWith(p.id+'|'))delete sent[k]});
    pushNote(me.name,{type:'info',text:byMe?'You removed '+dn(f)+' \u2014 you left \u201c'+p.name+'\u201d and its data was deleted from this device ('+fmt(at)+')':dn(f)+' removed you on '+fmt(at)+' \u2014 you were removed from \u201c'+p.name+'\u201d and its data was deleted from this device'});return}
   if(p.owner===me.name&&(p.members||[]).some(x=>x.user===f)){p.members=p.members.filter(x=>x.user!==f);
    pushNote(me.name,{type:'info',text:dn(f)+' was removed from \u201c'+p.name+'\u201d ('+fmt(at)+')'})}
   keep.push(p)});
  wj('mc_projects',keep);wj('mc_scn_sent',sent);wj('mc_out',outL().filter(e=>e.to!==f));
- try{softRender()}catch(e){}}
+ try{softRender()}catch(e){}
+ if(kicked)try{kickedUI(kicked)}catch(e){}}
 function gotBinv(c,m){const n=friends(me.name).find(x=>okPeer(c.peer,x));const pid=String(m.pid||'');const p=n&&rj('mc_projects',[]).find(q=>q.id===pid);
  if(!p||!(p.owner===n||(p.members||[]).some(x=>x.user===n&&x.status==='accepted')))return;
  const a=notes(me.name);if(a.some(x=>x.type==='build_open'&&x.pid===pid&&x.from===n&&!x.read&&Date.now()-x.t<6e4))return;
@@ -473,7 +473,7 @@ function handle(e,peer){
   else if(!notes(me.name).some(x=>x.type==='friend_request'&&x.from===f&&!x.done))pushNote(me.name,{type:'friend_request',from:f})}
  else if(e.k==='fr_acc'){if(asked){setFr(me.name,[...fl,f]);setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:dn(f)+' accepted your friend request'})}}
  else if(e.k==='fr_dec'){if(asked){setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:d.why==='link'?'The invite link from '+dn(f)+' is no longer valid':dn(f)+' declined your friend request'})}}
- else if(e.k==='fr_rm'){if(isF){setFr(me.name,fl.filter(x=>x!==f));pushNote(me.name,{type:'info',text:dn(f)+' removed you from their friends on '+fmt(+d.at||Date.now())});cutProjects(f,false,+d.at||Date.now());toast(dn(f)+' removed you')}}
+ else if(e.k==='fr_rm'){if(isF&&(+d.at||Date.now())>=(rj('mc_frt',{})[me.name+'|'+f]||0)){setFr(me.name,fl.filter(x=>x!==f));pushNote(me.name,{type:'info',text:dn(f)+' removed you from their friends on '+fmt(+d.at||Date.now())});cutProjects(f,false,+d.at||Date.now());toast(dn(f)+' removed you')}}
  else if(e.k==='chat'){if(isF){addMsg(pkey(me.name,f),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now(),tag:d.tag==='all'?'all':undefined});if(!(tab==='ms'&&chatWith===f&&!document.hidden)){toast('New message from '+dn(f));chime()}}}
  else if(e.k==='pinv'){if(isF&&/^[\w-]{3,40}$/.test(d.pid||'')&&!invSeen(d.pid))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer',ah:d.ah!==false})}
  else if(e.k==='jadm'){const key=(d.pid||'')+'|'+f;if(jaskL().includes(key)&&/^[\w-]{3,40}$/.test(d.pid||'')){const j=JOIN.cur&&JOIN.cur.pid===d.pid&&JOIN.cur.owner===f?JOIN.cur:null;
@@ -523,12 +523,15 @@ const jaskL=()=>me?(rj('mc_jasked',{})[me.name]||[]):[],jaskSet=l=>{const a=rj('
 const setJD=t=>{const e=$('jwd');if(e)e.textContent=t};
 const chime=()=>{try{const A=window.AudioContext||window.webkitAudioContext,a=chime.a=chime.a||new A(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1175,t+.12);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.15,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.45);o.start();o.stop(t+.5)}catch(e){}};
 function joinUI(t,s,opt){opt=opt||{};const w=$('jw');w.hidden=false;
- w.innerHTML=`<div class="jc">${opt.lock?'<svg class="i" style="width:42px;height:42px;margin-bottom:10px;color:var(--a)"><use href="#i-lock"/></svg>':opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small>${opt.bad||opt.lock||opt.nobtn?'':'<button id="jwr" class="pri" style="min-width:110px;margin-right:8px">Retry</button>'}<button id="jwc" class="${opt.bad||opt.lock?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad||opt.lock?'Back to projects':'Cancel'}</button></div>`;
- $('jwc').onclick=leaveJoin;if($('jwr'))$('jwr').onclick=joinRetry}
+ w.innerHTML=`<div class="jc">${opt.lock?'<svg class="i" style="width:42px;height:42px;margin-bottom:10px;color:var(--a)"><use href="#i-lock"/></svg>':opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small>${(opt.bad&&!opt.ts)||opt.lock||opt.nobtn?'':'<button id="jwr" class="pri" style="min-width:110px;margin-right:8px">\uD83D\uDEE0 Troubleshoot</button>'}<button id="jwc" class="${opt.bad||opt.lock?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad||opt.lock?'Back to projects':'Cancel'}</button></div>`;
+ $('jwc').onclick=leaveJoin;if($('jwr'))$('jwr').onclick=opt.ts||joinRetry}
 /* Retry: reconnect now; uses the troubleshoot relay ONLY until the host answers (or 20s), then drops back to peer-to-peer so almost no quota is used */
 let jrT=0;const endRelay=()=>{clearTimeout(jrT);if(RELAY_AUTO)relayOff()};
 function joinRetry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}j.c=null;setJD('Retrying\u2026');
  relayOn(true);clearTimeout(jrT);jrT=setTimeout(endRelay,20000);joinTry()}
+/* Troubleshoot on an error screen: ask the host again (they still have you as a member, so you are let straight back in); relay used only until the host answers (max 20s) */
+const tsJoin=j=>()=>{requestJoin(j.pid,j.owner,j.name);relayOn(true);clearTimeout(jrT);jrT=setTimeout(endRelay,20000)};
+function kickedUI(k){if(JOIN.cur)return;joinUI('Removed from project','You were removed from <b>'+esc(k.name)+'</b>. If the host did not do this, press Troubleshoot to get back in.',{bad:1,ts:tsJoin({pid:k.pid,owner:k.owner,name:k.name})})}
 function leaveJoin(){endRelay();const j=JOIN.cur;JOIN.cur=null;if(j){clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner))}$('jw').hidden=true;try{history.replaceState(null,'',location.pathname)}catch(e){}}
 function requestJoin(pid,owner,name){
  if(JOIN.cur&&JOIN.cur.pid===pid)return;leaveJoin();
@@ -557,7 +560,7 @@ function finishJoin(j,role,ah){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.clos
  if(ah===false&&whereIs(j.owner,j.pid)!=='here'){joinUI('You are in!','This project is locked until <b>'+esc(dn(j.owner))+'</b> is inside it.',{lock:1});render();return}
  joinUI('You are in!','Opening the designer\u2026',{nobtn:1});setTimeout(()=>go(DESIGN+'?p='+encodeURIComponent(j.pid)),700)}
 function joinDenied(j,why){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
- joinUI('Request declined',esc(why||'The host did not let you in.'),{bad:1})}
+ joinUI('Could not join',esc(why||'The host did not let you in.'),{bad:1,ts:tsJoin(j)})}
 
 /* host side: someone knocked on a project link */
 function onKnock(c,m){

@@ -833,14 +833,14 @@ ${pr?'':'<label class="l">Project name</label><input id="pn" maxlength="40" plac
 ${pr&&pr.members.length?`<label class="l">Already invited</label>${pr.members.map(x=>`<div class="row"><span class="av s">${esc(dn(x.user)[0]||'?')}</span><span class="sp">${esc(dn(x.user))}</span><span class="tag">${esc(x.role)}</span><span class="tag ${x.status==='accepted'?'ok':''}">${esc(x.status)}</span></div>`).join('')}`:''}
 <label class="l">Friends</label><div>${f.map(n=>`<div class="row"><input type="checkbox" data-u="${esc(n)}"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}</span><select data-r="${esc(n)}" style="height:30px">${ROLES.map(r=>`<option${r==='Builder'?' selected':''}>${r}</option>`).join('')}</select></div>`).join('')||'<div class="empty">No friends to add. Add friends from the Friends tab first.</div>'}</div>
 <label class="sw"><input type="checkbox" id="ah" ${pr&&pr.allowHostLeave?'checked':''}><span><b>Keep project open when I leave</b><br><small class="mut">Members can enter and keep working even if the host is offline.</small></span></label>
-<div class="err" id="perr"></div><div class="mact"><button id="pc">Cancel</button>${pr?'':'<button class="alt" id="pk2">Create</button>'}<button class="pri" id="pk">${pr?'Add to project':'Create & open'}</button></div></div>`;
+<div class="err" id="perr"></div><div class="mact"><button id="pc">Cancel</button>${pr?'':'<button class="alt" id="pk2">Create</button>'}${pr?'<button class="pri" id="pk">Add to project</button>':''}</div></div>`;
 document.body.appendChild(m);if($('pn'))$('pn').focus();$('pc').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
 const submit=open=>{const mem=[...m.querySelectorAll('[data-u]:checked')].map(c=>({user:c.dataset.u,role:m.querySelector(`[data-r="${c.dataset.u}"]`).value,status:'pending'})),ah=$('ah').checked;
 if(pr){const ps2=rj('mc_projects',[]),p=ps2.find(q=>q.id===pid);p.members.push(...mem);p.allowHostLeave=ah;wj('mc_projects',ps2);mem.forEach(x=>enq(x.user,'pinv',{pid:p.id,name:p.name,role:x.role}));m.remove();render();return}
 const name=$('pn').value.trim();if(!name)return $('perr').textContent='Give the project a name';m.remove();const np=mkProj(name,mem,ah);
 if(open)return go(DESIGN+'?p='+np.id);
 GEN[np.id]=Date.now();render();setTimeout(()=>{const g=document.querySelector('[data-gen]');if(g)g.scrollIntoView({behavior:'smooth',block:'center'})},60);setTimeout(render,2350)};
-$('pk').onclick=()=>submit(true);if($('pk2'))$('pk2').onclick=()=>submit(false)}
+if($('pk'))$('pk').onclick=()=>submit(true);if($('pk2'))$('pk2').onclick=()=>submit(false)}
 
 /* live updates across tabs */
 addEventListener('storage',e=>{softRender();if(e.key==='mc_out')flush()});if(bc)bc.onmessage=()=>softRender();

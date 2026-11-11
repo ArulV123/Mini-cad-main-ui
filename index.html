@@ -164,15 +164,25 @@ aside{background:var(--p)}.tabs{margin:10px;padding:4px;background:var(--h);bord
 @media(max-width:440px){.mact button{flex:1 1 auto}.mact #pc{order:3;flex:1 1 100%}}
 /* project card footer: people on top, buttons below in tidy equal-width rows */
 .pa{display:flex;flex-direction:column;align-items:stretch;gap:10px}
-.pa .pm{display:flex;align-items:center;gap:8px;min-width:0}.pa .pm .tag{margin-left:auto;white-space:nowrap}
+.pa .pm{display:flex;align-items:center;gap:8px;min-width:0}.pa .pm .tag{white-space:nowrap}
 .pa .pb{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
 .pa .pb button{flex:1 1 0;min-width:0;height:32px;padding:0 8px;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:10px}
 .pa .pb button.sm{font-size:12.5px;font-weight:600}
 .pa .pb button.rt{flex:1 1 100%;order:-1;color:#b45309;font-weight:600;border-color:color-mix(in srgb,#f59e0b 45%,var(--b));background:color-mix(in srgb,#f59e0b 12%,var(--p))}
 .pa .pb button.rt:hover:not(:disabled){background:color-mix(in srgb,#f59e0b 20%,var(--p))}
 @media(prefers-color-scheme:dark){.pa .pb button.rt{color:#fbbf4a}}
+/* lock indicator for projects that are not kept open */
+.pa .pm .tg2{margin-left:auto;display:flex;align-items:center;gap:6px}
+.tag.lk{display:inline-flex;align-items:center;justify-content:center;padding:3px 7px}.tag.lk svg{width:12px;height:12px}
+.proj.locked .tag.lk{color:#b45309;background:color-mix(in srgb,#f59e0b 16%,var(--p))}
+.lkov{position:absolute;inset:0;z-index:2;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:color-mix(in srgb,var(--p) 66%,transparent);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);color:var(--t);font:600 12px system-ui;pointer-events:none}
+.lkov svg{width:28px;height:28px;color:var(--a)}
+.proj.locked .lkov{display:flex}.proj.locked .th{cursor:not-allowed}.proj.locked .th .go{display:none}
+.pa .pb button.sm{display:inline-flex;align-items:center;gap:6px}
+.lki{display:none;width:13px;height:13px}.proj.locked .lki{display:block}.proj.locked .pb button[data-open]{opacity:.6;cursor:not-allowed}
+@media(prefers-color-scheme:dark){.proj.locked .tag.lk{color:#fbbf4a}}
 </style></head><body class="out">
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mc" viewBox="0 0 64 64"><defs><linearGradient id="lgm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgm)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol><symbol id="i-uadd" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></symbol><symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mc" viewBox="0 0 64 64"><defs><linearGradient id="lgm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgm)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></symbol><symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol><symbol id="i-uadd" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></symbol><symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></symbol></svg>
 <div id="veil" class="on"></div>
 <div id="jw" hidden></div>
 <div id="jr"></div>
@@ -460,9 +470,9 @@ function handle(e,peer){
  else if(e.k==='fr_dec'){if(asked){setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:d.why==='link'?'The invite link from '+dn(f)+' is no longer valid':dn(f)+' declined your friend request'})}}
  else if(e.k==='fr_rm'){if(isF){setFr(me.name,fl.filter(x=>x!==f));pushNote(me.name,{type:'info',text:dn(f)+' removed you from their friends on '+fmt(+d.at||Date.now())});cutProjects(f,false,+d.at||Date.now());toast(dn(f)+' removed you')}}
  else if(e.k==='chat'){if(isF){addMsg(pkey(me.name,f),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now(),tag:d.tag==='all'?'all':undefined});if(!(tab==='ms'&&chatWith===f&&!document.hidden)){toast('New message from '+dn(f));chime()}}}
- else if(e.k==='pinv'){if(isF&&/^[\w-]{3,40}$/.test(d.pid||'')&&!invSeen(d.pid))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer'})}
+ else if(e.k==='pinv'){if(isF&&/^[\w-]{3,40}$/.test(d.pid||'')&&!invSeen(d.pid))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer',ah:d.ah!==false})}
  else if(e.k==='jadm'){const key=(d.pid||'')+'|'+f;if(jaskL().includes(key)&&/^[\w-]{3,40}$/.test(d.pid||'')){const j=JOIN.cur&&JOIN.cur.pid===d.pid&&JOIN.cur.owner===f?JOIN.cur:null;
-  if(d.yes){if(j)finishJoin(j,d.role);else{addShared(d.pid,String(d.name||'Project').slice(0,40),f,d.role);jaskSet(jaskL().filter(x=>x!==key));pushNote(me.name,{type:'info',text:dn(f)+' let you into \u201c'+String(d.name||'Project').slice(0,40)+'\u201d'})}}
+  if(d.yes){if(j)finishJoin(j,d.role,d.ah);else{addShared(d.pid,String(d.name||'Project').slice(0,40),f,d.role,d.ah);jaskSet(jaskL().filter(x=>x!==key));pushNote(me.name,{type:'info',text:dn(f)+' let you into \u201c'+String(d.name||'Project').slice(0,40)+'\u201d'})}}
   else{if(j)joinDenied(j);else jaskSet(jaskL().filter(x=>x!==key))}}}
  else if(e.k==='gsync'){if(/^[\w-]{3,40}$/.test(d.gid||'')){const mem=cleanMem(d.members),gs=grpL(),g=gs.find(x=>x.id===d.gid),nm=String(d.name||'Group').slice(0,30);
   if(g){if(g.owner===f){if(!mem.includes(me.name)){setGrp(gs.filter(x=>x.id!==g.id));dropGroupData(g.id);if(chatWith==='g:'+g.id)chatWith=null;pushNote(me.name,{type:'info',text:'You are no longer in \u201c'+g.name+'\u201d'})}
@@ -471,6 +481,7 @@ function handle(e,peer){
  else if(e.k==='gleave'){const gs=grpL(),g=gs.find(x=>x.id===d.gid);if(g&&g.members.includes(f)){g.members=g.members.filter(x=>x!==f);setGrp(gs);sysMsg('g:'+g.id,dn(f)+' left')}}
  else if(e.k==='gchat'){const g=grpL().find(x=>x.id===d.gid);if(g&&g.members.includes(f)&&g.members.includes(me.name)){addMsg(ckey('g:'+g.id),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now()});if(!(tab==='ms'&&chatWith==='g:'+g.id&&!document.hidden)){toast(dn(f)+' in '+g.name);chime()}}}
  else if(e.k==='scn'){scnRecv(f,d).catch(x=>console.error(x))}
+ else if(e.k==='pah'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===f);if(isF&&p&&typeof d.ah==='boolean'){p.allowHostLeave=d.ah;wj('mc_projects',ps);try{bc&&bc.postMessage(1)}catch(x){}render()}if(isF&&typeof d.ah==='boolean'){const l=notes(me.name);l.forEach(x=>{if(x.type==='project_invite'&&x.pid===d.pid&&x.from===f&&!x.done)x.ah=d.ah});setNotes(me.name,l)}}
  else if(e.k==='prn'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===f);if(isF&&p&&typeof d.name==='string'&&d.name.trim()){p.name=d.name.trim().slice(0,40);wj('mc_projects',ps);try{bc&&bc.postMessage(1)}catch(x){}render()}}
  else if(e.k==='presp'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===me.name),m=p&&p.members.find(q=>q.user===f);
   if(m){m.status=d.yes?'accepted':'declined';wj('mc_projects',ps);pushNote(me.name,{type:'info',text:`${dn(f)} ${d.yes?'joined':'declined'} "${p.name}"`})}}
@@ -507,7 +518,7 @@ const jaskL=()=>me?(rj('mc_jasked',{})[me.name]||[]):[],jaskSet=l=>{const a=rj('
 const setJD=t=>{const e=$('jwd');if(e)e.textContent=t};
 const chime=()=>{try{const A=window.AudioContext||window.webkitAudioContext,a=chime.a=chime.a||new A(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1175,t+.12);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.15,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.45);o.start();o.stop(t+.5)}catch(e){}};
 function joinUI(t,s,opt){opt=opt||{};const w=$('jw');w.hidden=false;
- w.innerHTML=`<div class="jc">${opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small>${opt.bad||opt.nobtn?'':'<button id="jwr" class="pri" style="min-width:110px;margin-right:8px">Retry</button>'}<button id="jwc" class="${opt.bad?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad?'Back to projects':'Cancel'}</button></div>`;
+ w.innerHTML=`<div class="jc">${opt.lock?'<svg class="i" style="width:42px;height:42px;margin-bottom:10px;color:var(--a)"><use href="#i-lock"/></svg>':opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small>${opt.bad||opt.lock||opt.nobtn?'':'<button id="jwr" class="pri" style="min-width:110px;margin-right:8px">Retry</button>'}<button id="jwc" class="${opt.bad||opt.lock?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad||opt.lock?'Back to projects':'Cancel'}</button></div>`;
  $('jwc').onclick=leaveJoin;if($('jwr'))$('jwr').onclick=joinRetry}
 /* Retry: reconnect now; uses the troubleshoot relay ONLY until the host answers (or 20s), then drops back to peer-to-peer so almost no quota is used */
 let jrT=0;const endRelay=()=>{clearTimeout(jrT);if(RELAY_AUTO)relayOff()};
@@ -529,15 +540,16 @@ function joinTry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);
   c.on('data',m=>{if(JOIN.cur!==j||!m)return;
    if(m.t==='wait'||m.t==='welcome'||m.t==='denied')endRelay();
    if(m.t==='wait')joinUI('Waiting for the host\u2026','<b>'+esc(dn(j.owner))+'</b> has been asked. You will get in as soon as they admit you.');
-   else if(m.t==='welcome')finishJoin(j,m.role);
+   else if(m.t==='welcome')finishJoin(j,m.role,m.ah);
    else if(m.t==='denied')joinDenied(j,m.reason)});
   c.on('close',()=>{if(JOIN.cur===j&&j.c===c){j.c=null;setJD('Reconnecting to the host\u2026');retry(2000)}});c.on('error',()=>{});
   try{c.send({t:'knock',name:me.name,pid:j.pid,pn:j.name})}catch(e){retry(1500)}})}
-function addShared(pid,name,owner,role){const ps=rj('mc_projects',[]);let p=ps.find(x=>x.id===pid);
+function addShared(pid,name,owner,role,ah){const ps=rj('mc_projects',[]);let p=ps.find(x=>x.id===pid);
  if(!p){p={id:pid,name,owner,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}
- let m=p.members.find(x=>x.user===me.name);if(!m){m={user:me.name};p.members.push(m)}m.role=ROLES.includes(role)?role:'Builder';m.status='accepted';wj('mc_projects',ps);clearInv(pid)}
-function finishJoin(j,role){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}
- addShared(j.pid,j.name,j.owner,role);jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
+ if(typeof ah==='boolean')p.allowHostLeave=ah;let m=p.members.find(x=>x.user===me.name);if(!m){m={user:me.name};p.members.push(m)}m.role=ROLES.includes(role)?role:'Builder';m.status='accepted';wj('mc_projects',ps);clearInv(pid)}
+function finishJoin(j,role,ah){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}
+ addShared(j.pid,j.name,j.owner,role,ah);jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
+ if(ah===false&&whereIs(j.owner,j.pid)!=='here'){joinUI('You are in!','This project is locked until <b>'+esc(dn(j.owner))+'</b> is inside it.',{lock:1});render();return}
  joinUI('You are in!','Opening the designer\u2026',{nobtn:1});setTimeout(()=>go(DESIGN+'?p='+encodeURIComponent(j.pid)),700)}
 function joinDenied(j,why){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
  joinUI('Request declined',esc(why||'The host did not let you in.'),{bad:1})}
@@ -548,7 +560,7 @@ function onKnock(c,m){
  const p=rj('mc_projects',[]).find(x=>x.id===m.pid&&x.owner===me.name);
  if(!p){try{c.send({t:'denied',reason:'This project is no longer available.'})}catch(e){}return}
  const mem=p.members.find(x=>x.user===m.name);
- if(mem&&mem.status==='accepted'){try{c.send({t:'welcome',role:mem.role})}catch(e){}return}
+ if(mem&&mem.status==='accepted'){try{c.send({t:'welcome',role:mem.role,ah:p.allowHostLeave!==false})}catch(e){}return}
  const k=m.pid+'|'+m.name;LOBBY[k]=c;
  c.on('close',()=>{if(LOBBY[k]!==c)return;delete LOBBY[k];setTimeout(()=>{if(!me||LOBBY[k])return;setNotes(me.name,notes(me.name).filter(x=>!(x.type==='join_request'&&x.from===m.name&&x.pid===m.pid&&!x.done)));render()},20000)});
  try{c.send({t:'wait'})}catch(e){}
@@ -561,9 +573,9 @@ function decideJoin(id,yes,role){const l=notes(me.name),n=l.find(x=>x.id===id&&x
  const ps=rj('mc_projects',[]),p=ps.find(x=>x.id===n.pid&&x.owner===me.name);
  if(p){let m=p.members.find(x=>x.user===n.from);if(yes){if(!m){m={user:n.from};p.members.push(m)}m.role=role;m.status='accepted'}else if(m&&m.status!=='accepted')m.status='declined';wj('mc_projects',ps)}
  const k=n.pid+'|'+n.from,c=LOBBY[k];delete LOBBY[k];let sent=false;
- if(c&&c.open){try{c.send(yes?{t:'welcome',role}:{t:'denied',reason:'The host did not let you in.'});sent=true}catch(e){}}
+ if(c&&c.open){try{c.send(yes?{t:'welcome',role,ah:!p||p.allowHostLeave!==false}:{t:'denied',reason:'The host did not let you in.'});sent=true}catch(e){}}
  if(c&&!yes)setTimeout(()=>{try{c.close()}catch(e){}},800);
- if(yes||!sent)enq(n.from,'jadm',{pid:n.pid,name:n.name,yes:yes?1:0,role});
+ if(yes||!sent)enq(n.from,'jadm',{pid:n.pid,name:n.name,yes:yes?1:0,role,ah:!p||p.allowHostLeave!==false});
  ping();render()}
 const roleSel=id=>`<select data-jrole="${id}">${ROLES.map(r=>`<option${(JR_ROLE[id]||'Builder')===r?' selected':''}>${r}</option>`).join('')}</select>`;
 let jrSig='';
@@ -714,12 +726,14 @@ function retryInv(pid){const n=RT[pid]||0;RT[pid]=n+1;
 const GEN={};
 function whereIs(n,pid){const q=PRES[n];if(!q||!isOn(n))return 'off';return q.w==='b'?(q.pid===pid?'here':'other'):'lobby'}
 const WTXT={here:'In this project now',other:'In another project',lobby:'Online – on the projects page',off:'Not in this project'};
-function paintAv(){document.querySelectorAll('.av[data-pu]').forEach(e=>{const w=whereIs(e.dataset.pu,e.dataset.pp);e.classList.toggle('here',w==='here');e.title=(e.dataset.pn||e.dataset.pu)+' – '+WTXT[w]})}
+const lockd=p=>!!me&&p.owner!==me.name&&p.allowHostLeave===false&&whereIs(p.owner,p.id)!=='here';
+function paintAv(){document.querySelectorAll('.proj[data-lk]').forEach(e=>e.classList.toggle('locked',whereIs(e.dataset.ow,e.dataset.lk)!=='here'));document.querySelectorAll('.av[data-pu]').forEach(e=>{const w=whereIs(e.dataset.pu,e.dataset.pp);e.classList.toggle('here',w==='here');e.title=(e.dataset.pn||e.dataset.pu)+' – '+WTXT[w]})}
 function card(p,mine){const r=mine?'Owner':(p.members.find(m=>m.user===me.name)||{}).role,acc=p.members.filter(m=>m.status==='accepted'),ppl=[p.owner,...acc.map(m=>m.user)],pend=p.members.filter(m=>m.status==='pending').length;
 const ge=GEN[p.id]&&Date.now()-GEN[p.id]<2300?Date.now()-GEN[p.id]:-1;
-return `<article class="proj${ge>=0?' gen':''}"${ge>=0?' data-gen="1"':''}><div class="th" data-open="${p.id}" style="${p.thumb?`background-image:url(${p.thumb})`:''}">${p.thumb?'':'<svg class="ph"><use href="#mc"/></svg>'}${ge>=0?`<div class="genov" style="--el:-${ge}ms"><span>Creating project…</span></div>`:''}<span class="go">Open designer →</span></div>
+const lk=p.allowHostLeave===false,lkd=!mine&&lockd(p);
+return `<article class="proj${ge>=0?' gen':''}${lkd?' locked':''}"${ge>=0?' data-gen="1"':''}${lk&&!mine?` data-lk="${p.id}" data-ow="${esc(p.owner)}"`:''}><div class="th" data-open="${p.id}" style="${p.thumb?`background-image:url(${p.thumb})`:''}">${p.thumb?'':'<svg class="ph"><use href="#mc"/></svg>'}${ge>=0?`<div class="genov" style="--el:-${ge}ms"><span>Creating project…</span></div>`:''}${lk&&!mine?'<div class="lkov"><svg class="i"><use href="#i-lock"/></svg><span>Locked \u00B7 host is away</span></div>':''}<span class="go">Open designer →</span></div>
 <div class="pi"><div class="pt"><b>${esc(p.name)}</b>${mine?`<span class="ib"><button data-ren="${p.id}" title="Rename"><svg class="i"><use href="#i-edit"/></svg></button><button class="bad" data-del="${p.id}" title="Delete"><svg class="i"><use href="#i-trash"/></svg></button></span>`:''}</div><small>${mine?'':'by '+esc(dn(p.owner)||'a friend')+' · '}${p.updated?'Saved '+fmt(p.updated):'Created '+fmt(p.created)}</small>
-<div class="pa"><div class="pm"><span class="stack">${ppl.slice(0,4).map(n=>`<span class="av s" data-pu="${esc(n)}" data-pp="${p.id}" data-pn="${esc(dn(n))}" title="${esc(dn(n))}">${esc(dn(n)[0]||'?')}</span>`).join('')}</span><span class="tag">${esc(r)}</span></div><div class="pb">${mine&&unsent(p.id)?`<button class="inv rt" data-rt="${p.id}" title="Invite not delivered yet">${(RT[p.id]||0)>=2?'🛠 Troubleshoot':'↻ Retry invite'}</button>`:''}<button class="inv" data-cp="${p.id}" title="Copy a link to this project">Link</button>${mine?`<button class="inv" data-inv="${p.id}" title="Add friends to this project"><svg class="i"><use href="#i-uadd"/></svg>Invite${pend?` <em>${fmtN(pend)}</em>`:''}</button>`:`<button class="sm" data-open="${p.id}">Open</button>`}</div></div></div></article>`}
+<div class="pa"><div class="pm"><span class="stack">${ppl.slice(0,4).map(n=>`<span class="av s" data-pu="${esc(n)}" data-pp="${p.id}" data-pn="${esc(dn(n))}" title="${esc(dn(n))}">${esc(dn(n)[0]||'?')}</span>`).join('')}</span><span class="tg2">${lk?`<span class="tag lk" title="${mine?'Locked when you leave \u2013 members can only enter while you are inside':'Locked unless the host is inside the project'}"><svg class="i"><use href="#i-lock"/></svg></span>`:''}<span class="tag">${esc(r)}</span></span></div><div class="pb">${mine&&unsent(p.id)?`<button class="inv rt" data-rt="${p.id}" title="Invite not delivered yet">${(RT[p.id]||0)>=2?'🛠 Troubleshoot':'↻ Retry invite'}</button>`:''}<button class="inv" data-cp="${p.id}" title="Copy a link to this project">Link</button>${mine?`<button class="inv" data-inv="${p.id}" title="Add friends to this project"><svg class="i"><use href="#i-uadd"/></svg>Invite${pend?` <em>${fmtN(pend)}</em>`:''}</button>`:`<button class="sm" data-open="${p.id}">${lk?'<svg class="i lki"><use href="#i-lock"/></svg>':''}Open</button>`}</div></div></div></article>`}
 function renderProjects(){const ps=rj('mc_projects',[]),mine=ps.filter(p=>p.owner===me.name),sh=ps.filter(p=>p.owner!==me.name&&p.members.some(m=>m.user===me.name&&m.status==='accepted'));
 $('mine').innerHTML='<div class="newt" data-new="1"><i><svg class="i"><use href="#i-plus"/></svg></i>Create project<small>Opens the designer instantly</small></div>'+mine.map(p=>card(p,1)).join('');
 $('shared').innerHTML=sh.map(p=>card(p,0)).join('')||'<div class="empty">Projects friends add you to will show here.</div>';paintAv()}
@@ -731,7 +745,7 @@ try{const r=indexedDB.open('minicad',1);r.onupgradeneeded=()=>r.result.createObj
 else if(i)picker(i.dataset.inv);
 else if(rn){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===rn.dataset.ren),n=prompt('Rename project:',p.name);if(n&&n.trim()){p.name=n.trim().slice(0,40);wj('mc_projects',ps);(p.members||[]).filter(m=>m.status==='accepted'&&m.user!==me.name).forEach(m=>enq(m.user,'prn',{pid:p.id,name:p.name}));try{bc&&bc.postMessage(1)}catch(x){}render()}}
 else if(t.closest('[data-new]'))quick();
-else if(o)go(DESIGN+'?p='+o.dataset.open)});
+else if(o){const q=rj('mc_projects',[]).find(x=>x.id===o.dataset.open);if(q&&lockd(q))return toast('Locked \u2013 the host did not keep this project open and is not inside it right now');go(DESIGN+'?p='+o.dataset.open)}});
 
 /* notifications */
 const ago=t=>{const x=(Date.now()-t)/1e3;return x<60?'just now':x<3600?Math.floor(x/60)+'m ago':x<86400?Math.floor(x/3600)+'h ago':fmt(t)};
@@ -753,7 +767,7 @@ if(b.dataset.bo){go(DESIGN+'?p='+encodeURIComponent(b.dataset.bo));return}
 const id=b.dataset.na;if(!id)return;const l=notes(me.name),n=l.find(x=>x.id===id),yes=b.dataset.v==='y';n.done=b.dataset.v;n.read=1;setNotes(me.name,l);
 if(n.type==='friend_request'){if(yes){setFr(me.name,[...friends(me.name),n.from]);if(n.code)setInv(invL().map(x=>x.code===n.code?Object.assign(x,{n:(x.n||0)+1}):x))}enq(n.from,yes?'fr_acc':'fr_dec',{})}
 if(n.type==='project_invite'){const ps=rj('mc_projects',[]);let p=ps.find(q=>q.id===n.pid);
-if(yes){if(!p){p={id:n.pid,name:n.name,owner:n.from,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}
+if(yes){if(!p){p={id:n.pid,name:n.name,owner:n.from,members:[],allowHostLeave:true,created:Date.now()};ps.push(p)}p.allowHostLeave=n.ah!==false;
 let m=p.members.find(q=>q.user===me.name);if(!m){m={user:me.name,role:n.role};p.members.push(m)}m.role=n.role;m.status='accepted';wj('mc_projects',ps);clearInv(n.pid);GEN[n.pid]=Date.now();setTimeout(()=>{const g=document.querySelector('[data-gen]');if(g)g.scrollIntoView({behavior:'smooth',block:'center'})},60);setTimeout(render,2350)}
 enq(n.from,'presp',{pid:n.pid,yes:yes?1:0})}
 ping();render()};
@@ -824,7 +838,7 @@ function send(){const t=$('mt').value.trim();if(!t||!chatWith)return;const now=D
  ping();lastChat=null;render();$('mt').focus()}
 
 /* projects: quick create, create with friends, invite to existing */
-const mkProj=(name,mem,ah)=>{const ps=rj('mc_projects',[]),p={id:'p'+Date.now().toString(36)+rid().slice(0,3),name,owner:me.name,members:mem||[],allowHostLeave:!!ah,created:Date.now()};ps.push(p);wj('mc_projects',ps);(mem||[]).forEach(x=>enq(x.user,'pinv',{pid:p.id,name,role:x.role}));return p};
+const mkProj=(name,mem,ah)=>{const ps=rj('mc_projects',[]),p={id:'p'+Date.now().toString(36)+rid().slice(0,3),name,owner:me.name,members:mem||[],allowHostLeave:!!ah,created:Date.now()};ps.push(p);wj('mc_projects',ps);(mem||[]).forEach(x=>enq(x.user,'pinv',{pid:p.id,name,role:x.role,ah:!!ah}));return p};
 const quick=()=>{const n=rj('mc_projects',[]).filter(p=>p.owner===me.name).length+1;go(DESIGN+'?p='+mkProj('Untitled project '+n).id)};$('newp').onclick=quick;
 $('newf').onclick=()=>picker(null);
 function picker(pid){const ps=rj('mc_projects',[]),pr=pid&&ps.find(p=>p.id===pid),taken=pr?pr.members.map(m=>m.user):[],f=friends(me.name).filter(n=>!taken.includes(n)),m=document.createElement('div');m.className='modal';
@@ -832,11 +846,11 @@ m.innerHTML=`<div class="card"><h3>${pr?'Add friends to “'+esc(pr.name)+'”':
 ${pr?'':'<label class="l">Project name</label><input id="pn" maxlength="40" placeholder="e.g. Gear bearing">'}
 ${pr&&pr.members.length?`<label class="l">Already invited</label>${pr.members.map(x=>`<div class="row"><span class="av s">${esc(dn(x.user)[0]||'?')}</span><span class="sp">${esc(dn(x.user))}</span><span class="tag">${esc(x.role)}</span><span class="tag ${x.status==='accepted'?'ok':''}">${esc(x.status)}</span></div>`).join('')}`:''}
 <label class="l">Friends</label><div>${f.map(n=>`<div class="row"><input type="checkbox" data-u="${esc(n)}"><span class="av s">${esc(dn(n)[0]||'?')}</span><span class="sp">${esc(dn(n))}</span><select data-r="${esc(n)}" style="height:30px">${ROLES.map(r=>`<option${r==='Builder'?' selected':''}>${r}</option>`).join('')}</select></div>`).join('')||'<div class="empty">No friends to add. Add friends from the Friends tab first.</div>'}</div>
-<label class="sw"><input type="checkbox" id="ah" ${pr&&pr.allowHostLeave?'checked':''}><span><b>Keep project open when I leave</b><br><small class="mut">Members can enter and keep working even if the host is offline.</small></span></label>
+<label class="sw"><input type="checkbox" id="ah" ${!pr||pr.allowHostLeave!==false?'checked':''}><span><b><svg class="i" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;color:var(--a)"><use href="#i-lock"/></svg>Keep project open when I leave</b><br><small class="mut">Members can enter and keep working even if the host is offline. Untick it and the project stays locked for members until you are inside it.</small></span></label>
 <div class="err" id="perr"></div><div class="mact"><button id="pc">Cancel</button>${pr?'':'<button class="alt" id="pk2">Create</button>'}${pr?'<button class="pri" id="pk">Add to project</button>':''}</div></div>`;
 document.body.appendChild(m);if($('pn'))$('pn').focus();$('pc').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
 const submit=open=>{const mem=[...m.querySelectorAll('[data-u]:checked')].map(c=>({user:c.dataset.u,role:m.querySelector(`[data-r="${c.dataset.u}"]`).value,status:'pending'})),ah=$('ah').checked;
-if(pr){const ps2=rj('mc_projects',[]),p=ps2.find(q=>q.id===pid);p.members.push(...mem);p.allowHostLeave=ah;wj('mc_projects',ps2);mem.forEach(x=>enq(x.user,'pinv',{pid:p.id,name:p.name,role:x.role}));m.remove();render();return}
+if(pr){const ps2=rj('mc_projects',[]),p=ps2.find(q=>q.id===pid);const was=p.allowHostLeave!==false;p.members.push(...mem);p.allowHostLeave=ah;wj('mc_projects',ps2);if(was!==ah)p.members.filter(x=>x.user!==me.name&&!mem.includes(x)).forEach(x=>enq(x.user,'pah',{pid:p.id,ah}));mem.forEach(x=>enq(x.user,'pinv',{pid:p.id,name:p.name,role:x.role,ah}));m.remove();render();return}
 const name=$('pn').value.trim();if(!name)return $('perr').textContent='Give the project a name';m.remove();const np=mkProj(name,mem,ah);
 if(open)return go(DESIGN+'?p='+np.id);
 GEN[np.id]=Date.now();render();setTimeout(()=>{const g=document.querySelector('[data-gen]');if(g)g.scrollIntoView({behavior:'smooth',block:'center'})},60);setTimeout(render,2350)};

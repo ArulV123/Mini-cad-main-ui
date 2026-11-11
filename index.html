@@ -458,7 +458,7 @@ function rmWarn(n){const ps=rj('mc_projects',[]),leave=ps.filter(p=>p.owner===n)
 function cutProjects(f,byMe,at){at=at||Date.now();const ps=rj('mc_projects',[]),keep=[],sent=rj('mc_scn_sent',{});let kicked=null;
  ps.forEach(p=>{
   if(p.owner===f&&p.id){if(!byMe&&!kicked)kicked={pid:p.id,owner:p.owner,name:p.name};idbDel(p.id);Object.keys(sent).forEach(k=>{if(k.startsWith(p.id+'|'))delete sent[k]});
-   pushNote(me.name,{type:'info',text:byMe?'You removed '+dn(f)+' \u2014 you left \u201c'+p.name+'\u201d and its data was deleted from this device ('+fmt(at)+')':dn(f)+' removed you on '+fmt(at)+' \u2014 you were removed from \u201c'+p.name+'\u201d and its data was deleted from this device'});return}
+   pushNote(me.name,{type:byMe?'info':'removed',pid:p.id,owner:p.owner,name:p.name,text:byMe?'You removed '+dn(f)+' \u2014 you left \u201c'+p.name+'\u201d and its data was deleted from this device ('+fmt(at)+')':dn(f)+' removed you on '+fmt(at)+' \u2014 you were removed from \u201c'+p.name+'\u201d and its data was deleted from this device'});return}
   if(p.owner===me.name&&(p.members||[]).some(x=>x.user===f)){p.members=p.members.filter(x=>x.user!==f);
    pushNote(me.name,{type:'info',text:dn(f)+' was removed from \u201c'+p.name+'\u201d ('+fmt(at)+')'})}
   keep.push(p)});
@@ -493,8 +493,16 @@ function handle(e,peer){
  else if(e.k==='fr_acc'){if(asked){setFr(me.name,[...fl,f]);setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:dn(f)+' accepted your friend request'})}}
  else if(e.k==='fr_dec'){if(asked){setSent(sentL().filter(x=>x.to!==f));pushNote(me.name,{type:'info',text:d.why==='link'?'The invite link from '+dn(f)+' is no longer valid':dn(f)+' declined your friend request'})}}
  else if(e.k==='fr_rm'){if(isF&&(+d.at||Date.now())>=(rj('mc_frt',{})[me.name+'|'+f]||0)){setFr(me.name,fl.filter(x=>x!==f));pushNote(me.name,{type:'info',text:dn(f)+' removed you from their friends on '+fmt(+d.at||Date.now())});cutProjects(f,false,+d.at||Date.now());toast(dn(f)+' removed you')}}
- else if(e.k==='chat'){if(isF){addMsg(pkey(me.name,f),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now(),tag:d.tag==='all'?'all':undefined});if(!(tab==='ms'&&chatWith===f&&!document.hidden)){toast('New message from '+dn(f));chime()}}}
- else if(e.k==='pinv'){if(isF&&/^[\w-]{3,40}$/.test(d.pid||'')&&!invSeen(d.pid))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer',ah:d.ah!==false})}
+ else if(e.k==='chat'){if(isF&&!blkL().includes(f)){addMsg(pkey(me.name,f),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now(),tag:d.tag==='all'?'all':undefined});if(!(tab==='ms'&&chatWith===f&&!document.hidden)){toast('New message from '+dn(f));chime()}}}
+ else if(e.k==='pblk'){if(/^[\w-]{3,40}$/.test(d.pid||'')){const pid=d.pid,nm=String(d.name||'Project').slice(0,40),a=+d.at||Date.now(),ps=rj('mc_projects',[]),p=ps.find(q=>q.id===pid&&q.owner===f);
+  if(!(p&&a<(p.joinedAt||0))){
+   if(p){wj('mc_projects',ps.filter(q=>q!==p));idbDel(p.id);const sent=rj('mc_scn_sent',{});Object.keys(sent).forEach(k=>{if(k.startsWith(p.id+'|'))delete sent[k]});wj('mc_scn_sent',sent)}
+   blkBySet([...blkByL().filter(x=>x!==f),f]);
+   pushNote(me.name,{type:'info',text:dn(f)+' blocked you from \u201c'+nm+'\u201d on '+fmt(a)+' \u2014 you cannot ask to join again or message them'});
+   try{bc&&bc.postMessage(1)}catch(x){}softRender();showBlocked(pid,f,nm)}}}
+ else if(e.k==='punb'){if(/^[\w-]{3,40}$/.test(d.pid||'')&&bpL().includes(rkey(d.pid,f))){bpSet(bpL().filter(x=>x!==rkey(d.pid,f)));pushNote(me.name,{type:'info',text:dn(f)+' unblocked you \u2014 open the project link again to ask to join'});softRender()}}
+ else if(e.k==='cunb'){if(blkByL().includes(f)){blkBySet(blkByL().filter(x=>x!==f));pushNote(me.name,{type:'info',text:dn(f)+' unblocked you in Messages \u2014 you can chat again'});softRender()}}
+ else if(e.k==='pinv'){if(isF&&!blkL().includes(f)&&/^[\w-]{3,40}$/.test(d.pid||'')&&!invSeen(d.pid))pushNote(me.name,{type:'project_invite',from:f,pid:d.pid,name:String(d.name||'Project').slice(0,40),role:ROLES.includes(d.role)?d.role:'Viewer',ah:d.ah!==false})}
  else if(e.k==='jadm'){const key=(d.pid||'')+'|'+f;if(jaskL().includes(key)&&/^[\w-]{3,40}$/.test(d.pid||'')){const j=JOIN.cur&&JOIN.cur.pid===d.pid&&JOIN.cur.owner===f?JOIN.cur:null;
   if(d.yes){if(j)finishJoin(j,d.role,d.ah);else{addShared(d.pid,String(d.name||'Project').slice(0,40),f,d.role,d.ah);jaskSet(jaskL().filter(x=>x!==key));pushNote(me.name,{type:'info',text:dn(f)+' let you into \u201c'+String(d.name||'Project').slice(0,40)+'\u201d'})}}
   else{if(j)joinDenied(j);else jaskSet(jaskL().filter(x=>x!==key))}}}
@@ -503,7 +511,7 @@ function handle(e,peer){
     else{g.name=nm;g.members=mem;if(mem.includes(d.owner))g.owner=d.owner;setGrp(gs)}}}
   else if(isF&&d.owner===f&&mem.includes(me.name)&&mem.includes(f)){setGrp([...gs,{id:d.gid,name:nm,owner:f,members:mem,t:Date.now()}]);pushNote(me.name,{type:'info',text:dn(f)+' added you to the group \u201c'+nm+'\u201d'});toast('Added to group '+nm);chime()}}}
  else if(e.k==='gleave'){const gs=grpL(),g=gs.find(x=>x.id===d.gid);if(g&&g.members.includes(f)){g.members=g.members.filter(x=>x!==f);setGrp(gs);sysMsg('g:'+g.id,dn(f)+' left')}}
- else if(e.k==='gchat'){const g=grpL().find(x=>x.id===d.gid);if(g&&g.members.includes(f)&&g.members.includes(me.name)){addMsg(ckey('g:'+g.id),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now()});if(!(tab==='ms'&&chatWith==='g:'+g.id&&!document.hidden)){toast(dn(f)+' in '+g.name);chime()}}}
+ else if(e.k==='gchat'){const g=grpL().find(x=>x.id===d.gid);if(g&&g.members.includes(f)&&g.members.includes(me.name)&&!blkL().includes(f)){addMsg(ckey('g:'+g.id),{from:f,text:String(d.text||'').slice(0,2000),t:Date.now()});if(!(tab==='ms'&&chatWith==='g:'+g.id&&!document.hidden)){toast(dn(f)+' in '+g.name);chime()}}}
  else if(e.k==='scn'){scnRecv(f,d).catch(x=>console.error(x))}
  else if(e.k==='pah'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===f);if(isF&&p&&typeof d.ah==='boolean'&&p.allowHostLeave!==d.ah){p.allowHostLeave=d.ah;wj('mc_projects',ps);try{bc&&bc.postMessage(1)}catch(x){}render()}if(isF&&typeof d.ah==='boolean'){const l=notes(me.name);l.forEach(x=>{if(x.type==='project_invite'&&x.pid===d.pid&&x.from===f&&!x.done)x.ah=d.ah});setNotes(me.name,l)}}
  else if(e.k==='prn'){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===d.pid&&q.owner===f);if(isF&&p&&typeof d.name==='string'&&d.name.trim()){p.name=d.name.trim().slice(0,40);wj('mc_projects',ps);try{bc&&bc.postMessage(1)}catch(x){}render()}}
@@ -547,7 +555,7 @@ async function applyPst(f,d){
  ps=rj('mc_projects',[]);p=ps.find(q=>q.id===d.pid&&q.owner===d.owner);if(!p||!(at>(p.pstAt||0)))return;p.hk=pk;
  if(gone.includes(me.name)){if(at<(p.joinedAt||0)){wj('mc_projects',ps);return}
   wj('mc_projects',ps.filter(q=>q!==p));idbDel(p.id);const sent=rj('mc_scn_sent',{});Object.keys(sent).forEach(k=>{if(k.startsWith(p.id+'|'))delete sent[k]});wj('mc_scn_sent',sent);
-  pushNote(me.name,{type:'info',text:dn(p.owner)+' removed you from \u201c'+p.name+'\u201d on '+fmt(at)});try{bc&&bc.postMessage(1)}catch(x){}softRender();kickedUI({pid:p.id,owner:p.owner,name:p.name});return}
+  pushNote(me.name,{type:'removed',pid:p.id,owner:p.owner,name:p.name,text:dn(p.owner)+' removed you from \u201c'+p.name+'\u201d on '+fmt(at)});try{bc&&bc.postMessage(1)}catch(x){}softRender();kickedUI({pid:p.id,owner:p.owner,name:p.name});return}
  const rl={};d.m.forEach(x=>{if(Array.isArray(x)&&uOk(x[0])&&ROLES.includes(x[1]))rl[x[0]]=x[1]});
  const mine=(p.members||[]).find(x=>x.user===me.name&&x.status==='accepted'),oldRole=mine&&mine.role,nm=d.name.trim().slice(0,40);
  const mem=Object.keys(rl).filter(u=>u!==p.owner).map(u=>Object.assign((p.members||[]).find(x=>x.user===u)||{user:u},{role:rl[u],status:'accepted'}));
@@ -590,18 +598,79 @@ const jaskL=()=>me?(rj('mc_jasked',{})[me.name]||[]):[],jaskSet=l=>{const a=rj('
 const setJD=t=>{const e=$('jwd');if(e)e.textContent=t};
 const chime=()=>{try{const A=window.AudioContext||window.webkitAudioContext,a=chime.a=chime.a||new A(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1175,t+.12);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.15,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.45);o.start();o.stop(t+.5)}catch(e){}};
 function joinUI(t,s,opt){opt=opt||{};const w=$('jw');w.hidden=false;
- w.innerHTML=`<div class="jc">${opt.lock?'<svg class="i" style="width:42px;height:42px;margin-bottom:10px;color:var(--a)"><use href="#i-lock"/></svg>':opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small>${(opt.bad&&!opt.ts)||opt.lock||opt.nobtn?'':'<button id="jwr" class="pri" style="min-width:110px;margin-right:8px">\uD83D\uDEE0 Troubleshoot</button>'}<button id="jwc" class="${opt.bad||opt.lock?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad||opt.lock?'Back to projects':'Cancel'}</button></div>`;
- $('jwc').onclick=leaveJoin;if($('jwr'))$('jwr').onclick=opt.ts||joinRetry}
+ w.innerHTML=`<div class="jc">${opt.lock?'<svg class="i" style="width:42px;height:42px;margin-bottom:10px;color:var(--a)"><use href="#i-lock"/></svg>':opt.bad?'<div style="font-size:42px;margin-bottom:10px">\uD83D\uDEAB</div>':'<div class="spin"></div>'}<div style="font-size:22px;font-weight:700;margin-bottom:6px">${esc(t)}</div><div class="mut" style="margin-bottom:8px">${s}</div><small class="mut" id="jwd" style="display:block;min-height:18px;margin-bottom:16px"></small>${opt.act!==undefined?'<button id="jwr" class="pri" style="min-width:110px;margin-right:8px"'+(opt.dis?' disabled':'')+'>'+opt.act+'</button>':((opt.bad&&!opt.ts)||opt.lock||opt.nobtn?'':'<button id="jwr" class="pri" style="min-width:110px;margin-right:8px">\uD83D\uDEE0 Troubleshoot</button>')}<button id="jwc" class="${(opt.bad||opt.lock)&&(opt.act===undefined||opt.dis)?'pri':''}" style="min-width:150px"${opt.nobtn?' hidden':''}>${opt.bad||opt.lock?'Back to projects':'Cancel'}</button></div>`;
+ $('jwc').onclick=leaveJoin;if($('jwr')&&!opt.dis)$('jwr').onclick=opt.fn||joinRetry}
 /* Retry: reconnect now; uses the troubleshoot relay ONLY until the host answers (or 20s), then drops back to peer-to-peer so almost no quota is used */
 let jrT=0;const endRelay=()=>{clearTimeout(jrT);if(RELAY_AUTO)relayOff()};
 function joinRetry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}j.c=null;setJD('Retrying\u2026');
  relayOn(true);clearTimeout(jrT);jrT=setTimeout(endRelay,20000);joinTry()}
-/* Troubleshoot on an error screen: ask the host again (they still have you as a member, so you are let straight back in); relay used only until the host answers (max 20s) */
-const tsJoin=j=>()=>{requestJoin(j.pid,j.owner,j.name);relayOn(true);clearTimeout(jrT);jrT=setTimeout(endRelay,20000)};
-function kickedUI(k){if(JOIN.cur)return;joinUI('Removed from project','You were removed from <b>'+esc(k.name)+'</b>. If the host did not do this, press Troubleshoot to get back in.',{bad:1,ts:tsJoin({pid:k.pid,owner:k.owner,name:k.name})})}
-function leaveJoin(){endRelay();const j=JOIN.cur;JOIN.cur=null;if(j){clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner))}$('jw').hidden=true;try{history.replaceState(null,'',location.pathname)}catch(e){}}
+/* ===== removed from a project: Retry (normal, no relay) -> Retry again (normal) -> Troubleshoot (relay, only until the host answers) =====
+   Every press waits for the host's answer or an error. Once the host answers "removed" / "denied" / "blocked" the buttons are disabled for good;
+   only opening the project link again asks the host to approve. A blocked person cannot ask again until the host unblocks them. */
+const KT={},RMT={id:0},rkey=(pid,owner)=>pid+'|'+owner;
+const rAct=k=>(KT[k]||0)>=2?'\uD83D\uDEE0 Troubleshoot':'\u21BB Retry';
+const blkL=()=>me?(rj('mc_blk',{})[me.name]||[]):[],blkSet=l=>{const a=rj('mc_blk',{});a[me.name]=l;wj('mc_blk',a)};
+const blkByL=()=>me?(rj('mc_blkby',{})[me.name]||[]):[],blkBySet=l=>{const a=rj('mc_blkby',{});a[me.name]=l;wj('mc_blkby',a)};
+const bpL=()=>me?(rj('mc_blkp',{})[me.name]||[]):[],bpSet=l=>{const a=rj('mc_blkp',{});a[me.name]=l;wj('mc_blkp',a)};
+const isBlkP=(pid,owner)=>bpL().includes(rkey(pid,owner));
+const rmFinal=(pid,owner)=>{const l=notes(me.name);let ch=0;l.forEach(x=>{if(x.type==='removed'&&x.pid===pid&&x.owner===owner&&!x.final){x.final=1;ch=1}});if(ch)setNotes(me.name,l)};
+const isFinal=(pid,owner)=>{const n=notes(me.name).find(x=>x.type==='removed'&&x.pid===pid&&x.owner===owner);return !!(n&&n.final)};
+function showBlocked(pid,owner,name){const j=JOIN.cur;if(j&&j.pid===pid&&j.owner===owner){clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}JOIN.cur=null}
+ RMT.id++;endRelay();jaskSet(jaskL().filter(x=>x!==rkey(pid,owner)));
+ if(!isBlkP(pid,owner))bpSet([...bpL(),rkey(pid,owner)]);rmFinal(pid,owner);
+ if(JOIN.cur)return;
+ joinUI('You are blocked','<b>'+esc(dn(owner))+'</b> blocked you from <b>'+esc(name)+'</b>. You cannot ask to join or message them. If they unblock you, open the project link again to ask.',{bad:1,act:'\u21BB Retry',dis:1});try{render()}catch(e){}}
+function removedUI(k,fin){const key=rkey(k.pid,k.owner);
+ joinUI('Removed from project',fin?'<b>'+esc(dn(k.owner))+'</b> removed you from <b>'+esc(k.name)+'</b>. To ask to join again, open the project link \u2013 the host will be asked to approve you.':'You were removed from <b>'+esc(k.name)+'</b>. If the host did not do this, press the button below to check with them.',{bad:1,act:rAct(key),dis:!!fin,fn:()=>rmRetry(k)})}
+function rmFail(k,msg){joinUI('No answer yet',msg+' Press the button below to try again.',{bad:1,act:rAct(rkey(k.pid,k.owner)),fn:()=>rmRetry(k)});try{renderNotes()}catch(e){}}
+function rmConfirmed(k){rmFinal(k.pid,k.owner);removedUI(k,1);try{render()}catch(e){}}
+function kickedUI(k){if(JOIN.cur)return;if(isBlkP(k.pid,k.owner))return showBlocked(k.pid,k.owner,k.name);removedUI(k,isFinal(k.pid,k.owner))}
+async function rmRetry(k){if(!me||!k||!k.pid||!k.owner)return;const key=rkey(k.pid,k.owner);
+ if(isBlkP(k.pid,k.owner))return showBlocked(k.pid,k.owner,k.name);
+ if(isFinal(k.pid,k.owner))return removedUI(k,1);
+ leaveJoin();const tok=++RMT.id,live=()=>RMT.id===tok&&!!me,n=KT[key]||0,ts=n>=2,lab=rAct(key),sleep=ms=>new Promise(r=>setTimeout(r,ms));KT[key]=n+1;
+ joinUI(ts?'Troubleshooting\u2026':'Retrying\u2026','Asking <b>'+esc(dn(k.owner))+'</b> about <b>'+esc(k.name)+'</b>',{act:lab,dis:1});
+ try{
+  if(ts){relayOn(true);clearTimeout(jrT);jrT=setTimeout(endRelay,45000)}
+  setJD(ts?'Connecting through the relay\u2026':'Connecting\u2026');
+  const t0=Date.now();while(!NET.open&&Date.now()-t0<(ts?12000:8000)){await sleep(300);if(!live())return}
+  if(!NET.open)return rmFail(k,'You are not connected to the network yet.');
+  setJD('Contacting '+dn(k.owner)+'\u2026');
+  const c=await dial(k.owner);if(!live()){try{c&&c.close()}catch(e){}return}
+  if(!c)return rmFail(k,'Could not reach <b>'+esc(dn(k.owner))+'</b> \u2013 they may be offline.');
+  setJD('Waiting for a reply\u2026');
+  const r=await new Promise(res=>{let done=0,tm=0;const fin=v=>{if(done)return;done=1;clearTimeout(tm);res(v)};
+   tm=setTimeout(()=>fin({t:'timeout'}),ts?20000:12000);
+   c.on('data',m=>{if(m&&(m.t==='welcome'||m.t==='removed'||m.t==='blocked'||m.t==='denied'))fin(m)});
+   c.on('close',()=>fin({t:'closed'}));c.on('error',()=>fin({t:'error'}));
+   try{c.send({t:'knock',name:me.name,pid:k.pid,pn:k.name,rt:1})}catch(e){fin({t:'error'})}});
+  if(!live()){try{c.close()}catch(e){}return}
+  if(r.t==='welcome'){KT[key]=0;return finishJoin({pid:k.pid,owner:k.owner,name:k.name,t:0,c},r.role,r.ah)}
+  try{c.close()}catch(e){}
+  if(r.t==='blocked')return showBlocked(k.pid,k.owner,k.name);
+  if(r.t==='removed'||r.t==='denied')return rmConfirmed(k);
+  rmFail(k,'<b>'+esc(dn(k.owner))+'</b> did not answer.')
+ }finally{if(RMT.id===tok){clearTimeout(jrT);endRelay()}}}
+/* ===== host: block / unblock ===== */
+function blockUser(pid,user){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===pid&&q.owner===me.name);if(!p||!uOk(user))return;
+ p.blocked=[...(p.blocked||[]).filter(u=>u!==user),user];wj('mc_projects',ps);
+ blkSet([...blkL().filter(u=>u!==user),user]);
+ if((p.members||[]).some(x=>x.user===user))removeMember(pid,user,1);
+ else pushNote(me.name,{type:'info',text:dn(user)+' was blocked from \u201c'+p.name+'\u201d ('+fmt(Date.now())+')'});
+ enq(user,'pblk',{pid,name:p.name,at:Date.now()});render();toast(dn(user)+' blocked')}
+function blockJoin(id){const l=notes(me.name),n=l.find(x=>x.id===id&&x.type==='join_request');if(!n||n.done)return;
+ n.done='b';n.read=1;setNotes(me.name,l);const k=n.pid+'|'+n.from,c=LOBBY[k];delete LOBBY[k];
+ blockUser(n.pid,n.from);
+ if(c&&c.open){try{c.send({t:'blocked'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},800)}
+ ping();render()}
+function askBlock(id){const n=notes(me.name).find(x=>x.id===id&&x.type==='join_request');if(!n||n.done)return;
+ if(confirm('Block '+dn(n.from)+'?\n\nThey will not be able to ask to join \u201c'+n.name+'\u201d again or message you until you unblock them (people list of the project, and Messages).'))blockJoin(id)}
+function unblockProject(pid,user){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===pid&&q.owner===me.name);if(!p)return;
+ p.blocked=(p.blocked||[]).filter(u=>u!==user);wj('mc_projects',ps);enq(user,'punb',{pid});render();toast(dn(user)+' unblocked for this project \u2013 to chat, unblock them in Messages')}
+function unblockChat(user){blkSet(blkL().filter(u=>u!==user));enq(user,'cunb',{});render();toast(dn(user)+' unblocked')}
+function leaveJoin(){RMT.id++;endRelay();const j=JOIN.cur;JOIN.cur=null;if(j){clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner))}$('jw').hidden=true;try{history.replaceState(null,'',location.pathname)}catch(e){}}
 function requestJoin(pid,owner,name){
- if(JOIN.cur&&JOIN.cur.pid===pid)return;leaveJoin();
+ if(JOIN.cur&&JOIN.cur.pid===pid)return;leaveJoin();delete KT[rkey(pid,owner)];if(isBlkP(pid,owner)){showBlocked(pid,owner,name);return}
  const j=JOIN.cur={pid,owner,name,c:null,t:0,t0:Date.now()};
  jaskSet([...jaskL().filter(x=>x!==pid+'|'+owner),pid+'|'+owner]);
  joinUI('Asking to join\u2026','Contacting <b>'+esc(dn(owner))+'</b> about <b>'+esc(name)+'</b>');
@@ -613,10 +682,10 @@ function joinTry(){const j=JOIN.cur;if(!j)return;clearTimeout(j.t);
   if(!c){setJD('The host is not online yet \u2013 still trying ('+Math.round((Date.now()-j.t0)/1000)+'s)');return retry(3000)}
   j.c=c;
   c.on('data',m=>{if(JOIN.cur!==j||!m)return;
-   if(m.t==='wait'||m.t==='welcome'||m.t==='denied')endRelay();
+   if(m.t==='wait'||m.t==='welcome'||m.t==='denied'||m.t==='blocked')endRelay();
    if(m.t==='wait')joinUI('Waiting for the host\u2026','<b>'+esc(dn(j.owner))+'</b> has been asked. You will get in as soon as they admit you.');
    else if(m.t==='welcome')finishJoin(j,m.role,m.ah);
-   else if(m.t==='denied')joinDenied(j,m.reason)});
+   else if(m.t==='denied')joinDenied(j,m.reason);else if(m.t==='blocked')showBlocked(j.pid,j.owner,j.name)});
   c.on('close',()=>{if(JOIN.cur===j&&j.c===c){j.c=null;setJD('Reconnecting to the host\u2026');retry(2000)}});c.on('error',()=>{});
   try{c.send({t:'knock',name:me.name,pid:j.pid,pn:j.name})}catch(e){retry(1500)}})}
 function addShared(pid,name,owner,role,ah){const ps=rj('mc_projects',[]);let p=ps.find(x=>x.id===pid);
@@ -627,15 +696,17 @@ function finishJoin(j,role,ah){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.clos
  if(ah===false&&whereIs(j.owner,j.pid)!=='here'){joinUI('You are in!','This project is locked until <b>'+esc(dn(j.owner))+'</b> is inside it.',{lock:1});render();return}
  joinUI('You are in!','Opening the designer\u2026',{nobtn:1});setTimeout(()=>go(DESIGN+'?p='+encodeURIComponent(j.pid)),700)}
 function joinDenied(j,why){JOIN.cur=null;clearTimeout(j.t);try{j.c&&j.c.close()}catch(e){}jaskSet(jaskL().filter(x=>x!==j.pid+'|'+j.owner));
- joinUI('Could not join',esc(why||'The host did not let you in.'),{bad:1,ts:tsJoin(j)})}
+ joinUI('Could not join',esc(why||'The host did not let you in.')+' To ask again, open the project link again.',{bad:1,act:'\u21BB Retry',dis:1})}
 
 /* host side: someone knocked on a project link */
 function onKnock(c,m){
  if(!me||!/^[\w.~-]{2,40}$/.test(m.name||'')||m.name===me.name||!okPeer(c.peer,m.name)||!/^[\w-]{3,40}$/.test(m.pid||''))return;
  const p=rj('mc_projects',[]).find(x=>x.id===m.pid&&x.owner===me.name);
  if(!p){try{c.send({t:'denied',reason:'This project is no longer available.'})}catch(e){}return}
+ if((p.blocked||[]).includes(m.name)){try{c.send({t:'blocked'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},800);return}
  const mem=p.members.find(x=>x.user===m.name);
  if(mem&&mem.status==='accepted'){try{c.send({t:'welcome',role:mem.role,ah:p.allowHostLeave!==false})}catch(e){}if(p.pstAt)signSnap(pstSnap(p)).then(g=>enqPst(m.name,g)).catch(x=>console.error(x));else pstPush(p.id);return}
+ if(m.rt){try{c.send({t:'removed'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},800);return}
  const k=m.pid+'|'+m.name;LOBBY[k]=c;
  c.on('close',()=>{if(LOBBY[k]!==c)return;delete LOBBY[k];setTimeout(()=>{if(!me||LOBBY[k])return;setNotes(me.name,notes(me.name).filter(x=>!(x.type==='join_request'&&x.from===m.name&&x.pid===m.pid&&!x.done)));render()},20000)});
  try{c.send({t:'wait'})}catch(e){}
@@ -655,9 +726,9 @@ function decideJoin(id,yes,role){const l=notes(me.name),n=l.find(x=>x.id===id&&x
 const roleSel=id=>`<select data-jrole="${id}">${ROLES.map(r=>`<option${(JR_ROLE[id]||'Builder')===r?' selected':''}>${r}</option>`).join('')}</select>`;
 let jrSig='';
 function renderJR(l){const q=l.filter(x=>x.type==='join_request'&&!x.done),sig=q.map(x=>x.id).join();if(sig===jrSig)return;jrSig=sig;
- $('jr').innerHTML=q.map(x=>`<div class="jrc"><span class="av">${esc(dn(x.from)[0]||'?')}</span><div class="sp"><b>${esc(dn(x.from))}</b> wants to join<br><span class="mut">${esc(x.name)}</span><div class="na">${roleSel(x.id)}</div><div class="na"><button class="sm pri" data-ja="${x.id}" data-v="y">Admit</button><button class="sm" data-ja="${x.id}" data-v="n">Deny</button></div></div></div>`).join('')}
+ $('jr').innerHTML=q.map(x=>`<div class="jrc"><span class="av">${esc(dn(x.from)[0]||'?')}</span><div class="sp"><b>${esc(dn(x.from))}</b> wants to join<br><span class="mut">${esc(x.name)}</span><div class="na">${roleSel(x.id)}</div><div class="na"><button class="sm pri" data-ja="${x.id}" data-v="y">Admit</button><button class="sm" data-ja="${x.id}" data-v="n">Deny</button><button class="sm bad" data-ja="${x.id}" data-v="b" title="Deny and block">Block</button></div></div></div>`).join('')}
 document.addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.jrole;if(id)JR_ROLE[id]=e.target.value});
-$('jr').onclick=e=>{const b=e.target.closest('[data-ja]');if(b)decideJoin(b.dataset.ja,b.dataset.v==='y',JR_ROLE[b.dataset.ja])};
+$('jr').onclick=e=>{const b=e.target.closest('[data-ja]');if(b){if(b.dataset.v==='b')askBlock(b.dataset.ja);else decideJoin(b.dataset.ja,b.dataset.v==='y',JR_ROLE[b.dataset.ja])}};
 function loginHint(){const e=$('ljn'),s=sessionStorage.getItem('mc_pend');let t='';try{if(s){const q=new URLSearchParams(s);if(q.get('join'))t='You were invited to join \u201c'+(q.get('n')||'a project')+'\u201d. Pick a name \u2013 the host will be asked to let you in.';else if(q.get('add')||q.get('inv'))t='You were invited to connect. Pick a name to continue.'}}catch(x){}e.hidden=!t;e.textContent=t}
 
 /* ===== number badges, chat retention, unread ===== */
@@ -833,15 +904,18 @@ $('notes').innerHTML=`<div class="nh"><b>Notifications</b>${n?`<span class="tag 
 if(x.type==='friend_request'){ic='uadd';txt=`<b>${esc(dn(x.from))}</b> sent you a friend request`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Accept</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
 else if(x.type==='project_invite'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> invited you to <b>${esc(x.name)}</b> as ${esc(x.role)}`;if(!x.done)act=`<button class="sm pri" data-na="${x.id}" data-v="y">Join</button><button class="sm" data-na="${x.id}" data-v="n">Decline</button>`}
 else if(x.type==='build_open'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> is working on <b>${esc(x.name)}</b> \u2014 join the build if you like`;act=`<button class="sm pri" data-bo="${esc(x.pid)}">Open builder</button>`}
-else if(x.type==='join_request'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> is asking to join <b>${esc(x.name)}</b>`;if(!x.done)act=roleSel(x.id)+`<button class="sm pri" data-ja="${x.id}" data-v="y">Admit</button><button class="sm" data-ja="${x.id}" data-v="n">Deny</button>`}
+else if(x.type==='join_request'){ic='cube';txt=`<b>${esc(dn(x.from))}</b> is asking to join <b>${esc(x.name)}</b>`;if(!x.done)act=roleSel(x.id)+`<button class="sm pri" data-ja="${x.id}" data-v="y">Admit</button><button class="sm" data-ja="${x.id}" data-v="n">Deny</button><button class="sm bad" data-ja="${x.id}" data-v="b" title="Deny and block">Block</button>`}
+else if(x.type==='removed'){ic='info';txt=esc(x.text);const rk=rkey(x.pid,x.owner),back=rj('mc_projects',[]).some(q=>q.id===x.pid&&q.owner===x.owner&&(q.members||[]).some(m=>m.user===me.name&&m.status==='accepted'));
+if(x.pid&&x.owner&&!back)act=`<button class="sm pri" data-rr="${esc(x.pid)}" data-ro="${esc(x.owner)}" data-rn="${esc(x.name||'')}"${x.final?' disabled':''}>${rAct(rk)}</button>`}
 else txt=esc(x.text);
-return `<div class="ni${x.read?'':' un'}"><span class="nic ${ic}"><svg class="i"><use href="#i-${ic==='uadd'?'uadd':ic}"/></svg></span><div class="sp">${txt}<small class="mut">${ago(x.t)}${x.done?' · '+(x.done==='y'?'accepted':'declined'):''}</small>${act?`<div class="na">${act}</div>`:''}</div></div>`}).join('')||'<div class="nz"><svg class="i"><use href="#i-bell"/></svg><b>You’re all caught up</b><span class="mut">Friend requests and project invites show up here.</span></div>')+'</div>'}
+return `<div class="ni${x.read?'':' un'}"><span class="nic ${ic}"><svg class="i"><use href="#i-${ic==='uadd'?'uadd':ic}"/></svg></span><div class="sp">${txt}<small class="mut">${ago(x.t)}${x.done?' · '+(x.done==='y'?'accepted':x.done==='b'?'blocked':'declined'):''}</small>${act?`<div class="na">${act}</div>`:''}</div></div>`}).join('')||'<div class="nz"><svg class="i"><use href="#i-bell"/></svg><b>You’re all caught up</b><span class="mut">Friend requests and project invites show up here.</span></div>')+'</div>'}
 const closeN=()=>{if($('notes').hidden)return;$('notes').hidden=true;setNotes(me.name,notes(me.name).map(x=>(x.read=1,x)));renderNotes()};
 $('bell').onclick=e=>{e.stopPropagation();$('notes').hidden?$('notes').hidden=false:closeN()};
 document.addEventListener('click',e=>{if(me&&!$('notes').hidden&&!e.target.closest('#notes,#bell'))closeN()});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&me)closeN()});
 $('notes').onclick=e=>{const b=e.target;if(b.id==='nclr'){setNotes(me.name,[]);return render()}
-if(b.dataset.ja){decideJoin(b.dataset.ja,b.dataset.v==='y',JR_ROLE[b.dataset.ja]);return}
+if(b.dataset.ja){if(b.dataset.v==='b')askBlock(b.dataset.ja);else decideJoin(b.dataset.ja,b.dataset.v==='y',JR_ROLE[b.dataset.ja]);return}
+if(b.dataset.rr){const k={pid:b.dataset.rr,owner:b.dataset.ro,name:b.dataset.rn||'Project'};closeN();rmRetry(k);return}
 if(b.dataset.bo){go(DESIGN+'?p='+encodeURIComponent(b.dataset.bo));return}
 const id=b.dataset.na;if(!id)return;const l=notes(me.name),n=l.find(x=>x.id===id),yes=b.dataset.v==='y';n.done=b.dataset.v;n.read=1;setNotes(me.name,l);
 if(n.type==='friend_request'){if(yes){setFr(me.name,[...friends(me.name),n.from]);if(n.code)setInv(invL().map(x=>x.code===n.code?Object.assign(x,{n:(x.n||0)+1}):x))}enq(n.from,yes?'fr_acc':'fr_dec',{})}
@@ -881,7 +955,9 @@ const pn=RN[chatWith];RN[chatWith]=all.length;let pd='';
 const body=ms.map((m,i)=>{const dl=dayL(m.t);let h='';if(dl!==pd){pd=dl;h=`<div class="dsep"><span>${dl}</span></div>`}
  if(m.sys)return h+`<div class="sysm">${esc(m.text)}</div>`;const mine=m.from===me.name;
  return h+`<div class="msg${mine?' me':''}${pn!==undefined&&off+i>=pn?' pop':''}">${g&&!mine?`<small class="snd" style="color:${nc(m.from)}">${esc(dn(m.from))}</small>`:''}<span>${esc(m.text)}</span><span class="mm">${(isAll||m.tag==='all')?'<small class="tg">All</small>':'<span></span>'}<small class="tm">${hm(m.t)}</small></span></div>`}).join('');
-p.innerHTML=`<div class="chat"><div class="chh"><button class="sm" data-back="1" title="Back">\u2190</button><span class="av" style="${avS}">${avT}</span><span class="sp"><b>${esc(title)}</b><small class="mut" ${isF?`data-pst="${esc(chatWith)}"`:''} style="display:block">${sub}</small></span>${g?'<button class="sm" data-ginfo="1">Info</button>':''}</div><div class="msgs" id="msgs">${all.length>lim?`<button class="sm" data-more="1" style="align-self:center;flex:none">Show earlier (${fmtN(all.length-lim)})</button>`:''}${body||`<div class="empty" style="margin:auto">${isAll?'Say something to everyone \uD83D\uDCE2':'Say hi \uD83D\uDC4B'}</div>`}</div><div class="cin"><input id="mt" autocomplete="off" placeholder="${isAll?'Message all friends':g?'Message '+esc(g.name):'Message '+esc(dn(chatWith))}"><button class="pri" id="mb" title="Send"><svg class="i" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg></button></div></div>`;
+const blkMe=isF&&blkL().includes(chatWith),blkThem=isF&&!blkMe&&blkByL().includes(chatWith),BS='display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:10px 12px;border:1px solid var(--b);border-radius:12px',
+blkBar=blkMe?`<div style="${BS}"><span class="mut" style="font-size:13px">You blocked ${esc(dn(chatWith))}. They cannot message you.</span><button class="sm pri" data-cub="${esc(chatWith)}">Unblock</button></div>`:blkThem?`<div style="${BS}"><span class="mut" style="font-size:13px">${esc(dn(chatWith))} blocked you. You cannot send messages.</span></div>`:'';
+p.innerHTML=`<div class="chat"><div class="chh"><button class="sm" data-back="1" title="Back">\u2190</button><span class="av" style="${avS}">${avT}</span><span class="sp"><b>${esc(title)}</b><small class="mut" ${isF?`data-pst="${esc(chatWith)}"`:''} style="display:block">${sub}</small></span>${g?'<button class="sm" data-ginfo="1">Info</button>':''}</div><div class="msgs" id="msgs">${all.length>lim?`<button class="sm" data-more="1" style="align-self:center;flex:none">Show earlier (${fmtN(all.length-lim)})</button>`:''}${body||`<div class="empty" style="margin:auto">${isAll?'Say something to everyone \uD83D\uDCE2':'Say hi \uD83D\uDC4B'}</div>`}</div>${blkBar||`<div class="cin"><input id="mt" autocomplete="off" placeholder="${isAll?'Message all friends':g?'Message '+esc(g.name):'Message '+esc(dn(chatWith))}"><button class="pri" id="mb" title="Send"><svg class="i" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg></button></div>`}</div>`;
 const m=$('msgs');if(near)m.scrollTop=m.scrollHeight}
 else{const rows=[['Display name',dn(me.name)],['User ID',me.id],['WebRTC peer ID',pid(me.name)],['Session ID',me.session],['Account created',fmt(me.created)],['This login',fmt(me.last)],['Previous login',me.prevLogin?fmt(me.prevLogin):'First time'],['Total logins',me.logins],['Time zone',me.tz],['Language',me.lang],['Screen',me.screen],['Device',me.ua]];
 p.innerHTML=`<dl>${rows.map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('')}</dl><p class="mut" style="font-size:12px">Saved on this device. The design page reads this same session (<code>window.MC</code>) so it can use the peer ID and project room for WebRTC.</p>`}}
@@ -901,6 +977,7 @@ if(b.dataset.cpi)copy(invLink(b.dataset.cpi));
 if(b.dataset.shi)navigator.share({title:'Join me on MiniCAD',text:'Open this link to become my friend on MiniCAD',url:invLink(b.dataset.shi)}).catch(()=>{});
 if(b.dataset.rvi){setInv(invL().filter(x=>x.code!==b.dataset.rvi));renderPane()}
 if(b.dataset.chat)openChat(b.dataset.chat);
+if(b.dataset.cub)unblockChat(b.dataset.cub);
 if(b.dataset.more){CHATLIM[chatWith]=(CHATLIM[chatWith]||80)+200;renderPane()}
 if(b.dataset.rm&&confirm(rmWarn(b.dataset.rm))){const n=b.dataset.rm;setFr(me.name,friends(me.name).filter(x=>x!==n));cutProjects(n,true,Date.now());enq(n,'fr_rm',{at:Date.now()});ping();render()}
 if(b.dataset.cancel){cancelReq(b.dataset.cancel);renderPane()}
@@ -910,9 +987,9 @@ $('pane').onchange=e=>{if(e.target.id==='cw'){chatWith=e.target.value;render()}
 if(e.target.id==='ret'){const v=e.target.value,r=RET.find(x=>x[0]===v),cur=retMs(),shrink=r[2]!==-1&&cur!==0&&(cur===-1||r[2]<cur);
  if(shrink&&!confirm(r[2]===0?'Chats will stop being saved and the ones on this device will be deleted now. Continue?':'Messages older than '+r[1]+' will be deleted from this device. Continue?')){renderPane();return}
  const a=rj('mc_ret',{});a[me.name]=v;wj('mc_ret',a);pruneMsgs();lastChat=null;render()}};
-function send(){const t=$('mt').value.trim();if(!t||!chatWith)return;const now=Date.now();
- if(chatWith==='@all'){const f=friends(me.name);if(!f.length)return;addMsg(ckey('@all'),{from:me.name,text:t,t:now,tag:'all'});f.forEach(u=>enq(u,'chat',{text:t,tag:'all'}))}
- else if(chatWith.startsWith('g:')){const g=grpOf(chatWith);if(!g)return;addMsg(ckey(chatWith),{from:me.name,text:t,t:now});g.members.filter(x=>x!==me.name).forEach(u=>enq(u,'gchat',{gid:g.id,text:t}))}
+function send(){const t=$('mt')&&$('mt').value.trim();if(!t||!chatWith)return;if(blkL().includes(chatWith)||blkByL().includes(chatWith))return;const now=Date.now();
+ if(chatWith==='@all'){const f=friends(me.name);if(!f.length)return;addMsg(ckey('@all'),{from:me.name,text:t,t:now,tag:'all'});f.filter(u=>!blkL().includes(u)&&!blkByL().includes(u)).forEach(u=>enq(u,'chat',{text:t,tag:'all'}))}
+ else if(chatWith.startsWith('g:')){const g=grpOf(chatWith);if(!g)return;addMsg(ckey(chatWith),{from:me.name,text:t,t:now});g.members.filter(x=>x!==me.name&&!blkL().includes(x)).forEach(u=>enq(u,'gchat',{gid:g.id,text:t}))}
  else{addMsg(pkey(me.name,chatWith),{from:me.name,text:t,t:now});enq(chatWith,'chat',{text:t})}
  ping();lastChat=null;render();$('mt').focus()}
 
@@ -923,18 +1000,18 @@ $('newf').onclick=()=>picker(null);
 /* ===== Manage project (pen button): rename, keep-open, search people, change roles, remove ===== */
 function setRole(pid,user,role){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===pid&&q.owner===me.name),x=p&&p.members.find(q=>q.user===user);
  if(!x||!ROLES.includes(role)||x.role===role)return;x.role=role;wj('mc_projects',ps);pstPush(pid);render();toast(dn(user)+' is now '+role)}
-function removeMember(pid,user){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===pid&&q.owner===me.name);if(!p)return;
+function removeMember(pid,user,blk){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===pid&&q.owner===me.name);if(!p)return;
  p.members=(p.members||[]).filter(x=>x.user!==user);p.gone=[...(p.gone||[]).filter(u=>u!==user),user];wj('mc_projects',ps);
  const sent=rj('mc_scn_sent',{});delete sent[pid+'|'+user];wj('mc_scn_sent',sent);
  wj('mc_out',outL().filter(e=>!(e.from===me.name&&e.to===user&&(e.k==='pinv'||e.k==='scn')&&e.d&&e.d.pid===pid)));
  const c=LOBBY[pid+'|'+user];if(c){delete LOBBY[pid+'|'+user];try{c.close()}catch(e){}}
- pstPush(pid);pushNote(me.name,{type:'info',text:dn(user)+' was removed from \u201c'+p.name+'\u201d ('+fmt(Date.now())+')'});render();toast(dn(user)+' removed')}
+ pstPush(pid);pushNote(me.name,{type:'info',text:dn(user)+' was removed'+(blk?' and blocked':'')+' from \u201c'+p.name+'\u201d ('+fmt(Date.now())+')'});render();toast(dn(user)+' removed')}
 function manage(pid){const P=()=>rj('mc_projects',[]).find(q=>q.id===pid&&q.owner===me.name);let p=P();if(!p)return;
  const m=document.createElement('div');m.className='modal';let qv='';
  m.innerHTML=`<div class="card mg"><div class="mgh"><div><h3>Manage project</h3><div class="mut">Rename it, choose who is in it and what they can do.</div></div><button class="mgx" id="mgx" aria-label="Close">\u2715</button></div>
 <label class="l">Project name</label><div class="mgn"><input type="text" id="mgn" maxlength="40" value="${esc(p.name)}"><button class="pri" id="mgs" disabled>Save</button></div>
 <label class="sw mgk"><input type="checkbox" id="mgk" ${p.allowHostLeave!==false?'checked':''}><span><b><svg class="i" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;color:var(--a)"><use href="#i-lock"/></svg>Keep project open when I leave</b><br><small class="mut">Members can keep working while you are away. Untick it and the project stays locked for members until you are inside it.</small></span></label>
-<div class="mgp"><label class="l" id="mgc"></label><input type="text" id="mgq" placeholder="Search people" autocomplete="off"></div><div class="mgl" id="mgl"></div>
+<div class="mgp"><label class="l" id="mgc"></label><input type="text" id="mgq" placeholder="Search people" autocomplete="off"></div><div class="mgl" id="mgl"></div><div id="mgbw"></div>
 <div class="mact"><button class="pri" id="mgd">Done</button></div></div>`;
  document.body.appendChild(m);
  const ini=u=>esc(dn(u)[0]||'?'),draw=()=>{p=P();if(!p){m.remove();return}
@@ -942,8 +1019,9 @@ function manage(pid){const P=()=>rj('mc_projects',[]).find(q=>q.id===pid&&q.owne
    all=[{user:p.owner,host:1},...(p.members||[])],list=all.filter(x=>!q||dn(x.user).toLowerCase().includes(q));
   $('mgc').textContent='People \u00B7 '+fmtN(acc+1);
   $('mgl').innerHTML=list.length?list.map(x=>x.host?`<div class="mgr"><span class="av">${ini(x.user)}</span><span class="sp"><b>${esc(dn(x.user))}</b><small class="mut">${x.user===me.name?'You':'Project owner'}</small></span><span class="tag ok">Host</span></div>`
-   :`<div class="mgr"><span class="av">${ini(x.user)}</span><span class="sp"><b>${esc(dn(x.user))}</b><small class="mut">${x.status==='accepted'?'Member':x.status==='pending'?'Invite sent':'Declined'}</small></span>${x.status==='accepted'?`<select data-mr="${esc(x.user)}" title="Role">${ROLES.map(r=>`<option${x.role===r?' selected':''}>${r}</option>`).join('')}</select>`:`<span class="tag">${esc(x.status)}</span>`}<button class="mgrm bad" data-mk="${esc(x.user)}" title="Remove from project" aria-label="Remove ${esc(dn(x.user))}"><svg class="i"><use href="#i-trash"/></svg></button></div>`).join('')
-   :'<div class="mge">No one matches your search.</div>'};
+   :`<div class="mgr"><span class="av">${ini(x.user)}</span><span class="sp"><b>${esc(dn(x.user))}</b><small class="mut">${x.status==='accepted'?'Member':x.status==='pending'?'Invite sent':'Declined'}</small></span>${x.status==='accepted'?`<select data-mr="${esc(x.user)}" title="Role">${ROLES.map(r=>`<option${x.role===r?' selected':''}>${r}</option>`).join('')}</select>`:`<span class="tag">${esc(x.status)}</span>`}<button class="mgrm bad" data-mb="${esc(x.user)}" title="Block (remove and stop them asking again)" aria-label="Block ${esc(dn(x.user))}"><span style="font-size:14px">\uD83D\uDEAB</span></button><button class="mgrm bad" data-mk="${esc(x.user)}" title="Remove from project" aria-label="Remove ${esc(dn(x.user))}"><svg class="i"><use href="#i-trash"/></svg></button></div>`).join('')
+   :'<div class="mge">No one matches your search.</div>';
+  const bl=p.blocked||[];$('mgbw').innerHTML=bl.length?'<label class="l" style="margin-top:14px">Blocked \u00B7 '+fmtN(bl.length)+'</label><div class="mgl">'+bl.map(u=>`<div class="mgr"><span class="av">${ini(u)}</span><span class="sp"><b>${esc(dn(u))}</b><small class="mut">Blocked \u2013 cannot ask to join</small></span><button class="sm" data-ub="${esc(u)}">Unblock</button></div>`).join('')+'</div>':''};
  draw();
  const close=()=>m.remove(),save=()=>{const nm=$('mgn').value.trim().slice(0,40);if(!nm)return;const ps=rj('mc_projects',[]),q=ps.find(x=>x.id===pid&&x.owner===me.name);if(!q)return;q.name=nm;wj('mc_projects',ps);pstPush(pid);render();$('mgs').disabled=true;toast('Project renamed')};
  $('mgx').onclick=close;$('mgd').onclick=close;m.onclick=e=>{if(e.target===m)close()};
@@ -951,7 +1029,8 @@ function manage(pid){const P=()=>rj('mc_projects',[]).find(q=>q.id===pid&&q.owne
  $('mgk').onchange=()=>{const ps=rj('mc_projects',[]),q=ps.find(x=>x.id===pid&&x.owner===me.name);if(!q)return;q.allowHostLeave=$('mgk').checked;wj('mc_projects',ps);pstPush(pid);render();toast($('mgk').checked?'Project stays open when you leave':'Project locks when you leave')};
  $('mgq').oninput=e=>{qv=e.target.value;draw()};
  $('mgl').onchange=e=>{const t=e.target.closest('[data-mr]');if(t){setRole(pid,t.dataset.mr,t.value);draw()}};
- $('mgl').onclick=e=>{const b=e.target.closest('[data-mk]');if(!b)return;const u=b.dataset.mk;
+ $('mgbw').onclick=e=>{const b=e.target.closest('[data-ub]');if(b){unblockProject(pid,b.dataset.ub);draw()}};
+ $('mgl').onclick=e=>{const bb=e.target.closest('[data-mb]');if(bb){const u=bb.dataset.mb;if(confirm('Block '+dn(u)+'?\n\nThey are removed from \u201c'+p.name+'\u201d, cannot ask to join again and cannot message you. You can unblock them later.')){blockUser(pid,u);draw()}return}const b=e.target.closest('[data-mk]');if(!b)return;const u=b.dataset.mk;
   if(!confirm('Remove '+dn(u)+' from \u201c'+p.name+'\u201d?\n\nThey lose access and their copy is deleted from their device.'))return;removeMember(pid,u);draw()}}
 function picker(pid){const ps=rj('mc_projects',[]),pr=pid&&ps.find(p=>p.id===pid),taken=pr?pr.members.map(m=>m.user):[],f=friends(me.name).filter(n=>!taken.includes(n)),m=document.createElement('div');m.className='modal';
 m.innerHTML=`<div class="card"><h3>${pr?'Add friends to “'+esc(pr.name)+'”':'New project with friends'}</h3><div class="mut">Choose who joins and what they can do.</div>
